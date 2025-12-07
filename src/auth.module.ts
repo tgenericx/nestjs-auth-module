@@ -77,12 +77,6 @@ export class AuthModule {
   }
 
   static forRootAsync(options: AuthModuleAsyncOptions): DynamicModule {
-    const asyncConfigProvider: Provider = {
-      provide: AUTH_MODULE_CONFIG,
-      useFactory: options.useFactory,
-      inject: options.inject || [],
-    };
-
     return {
       module: AuthModule,
       imports: [
@@ -101,7 +95,11 @@ export class AuthModule {
         }),
       ],
       providers: [
-        asyncConfigProvider,
+        {
+          provide: AUTH_MODULE_CONFIG,
+          useFactory: options.useFactory,
+          inject: options.inject || [],
+        },
         {
           provide: USER_REPOSITORY,
           useFactory: async (...args: any[]) => {
@@ -124,24 +122,25 @@ export class AuthModule {
         JwtStrategy,
         JwtAuthGuard,
         RolesGuard,
-        // Conditionally add Google strategy via a factory
+        // Only provide GoogleStrategy if google config exists
         {
-          provide: 'GOOGLE_STRATEGY_FACTORY',
-          useFactory: async (...args: any[]) => {
-            const config = await options.useFactory(...args);
+          provide: GoogleStrategy,
+          useFactory: async (config: IAuthModuleConfig) => {
             if (config.google) {
-              return GoogleStrategy;
+              return new GoogleStrategy(config);
             }
             return null;
           },
-          inject: options.inject || [],
+          inject: [AUTH_MODULE_CONFIG],
         },
+        GoogleAuthGuard,
       ],
       exports: [
         AuthService,
         TokenService,
         PasswordService,
         JwtAuthGuard,
+        GoogleAuthGuard,
         RolesGuard,
       ],
     };
