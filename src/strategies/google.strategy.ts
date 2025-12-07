@@ -7,10 +7,13 @@ import type { IAuthModuleConfig } from '../interfaces/auth-config.interface';
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(@Inject(AUTH_MODULE_CONFIG) config: IAuthModuleConfig) {
+    if (!config.google?.clientID || !config.google?.clientSecret || !config.google?.callbackURL) {
+      throw new Error('Google OAuth configuration is missing or incomplete.');
+    }
     super({
-      clientID: config.google?.clientID,
-      clientSecret: config.google?.clientSecret,
-      callbackURL: config.google?.callbackURL,
+      clientID: config.google.clientID,
+      clientSecret: config.google.clientSecret,
+      callbackURL: config.google.callbackURL,
       scope: ['email', 'profile'],
     });
   }
