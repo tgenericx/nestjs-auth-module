@@ -126,4 +126,41 @@ export class AuthService {
     // Note: You'll need to store the reset token with expiry
     // This is left to the consuming app to implement
   }
+
+  async googleLogin(googleProfile: any): Promise<TokenResponseDto> {
+    // Check if user exists by Google ID
+    let user = await this.userRepository.findByGoogleId(googleProfile.googleId);
+
+    if (!user) {
+      // Check if user exists by email
+      user = await this.userRepository.findByEmail(googleProfile.email);
+
+      if (user) {
+        // User exists with this email but no Google ID
+        // This means they registered with email/password
+        // You might want to link the accounts or throw an error
+        throw new BadRequestException('An account with this email already exists. Please log in with your password.');
+      }
+
+      // Create new user from Google profile
+      user = await this.userRepository.createFromGoogle(
+        googleProfile.email,
+        googleProfile.googleId,
+        googleProfile,
+      );
+    }
+
+    // Generate tokens
+    const accessToken = this.tokenService.generateAccessToken(user);
+    const refreshToken = this.tokenService.generateRefreshToken(user);
+
+    // Store hashed refresh token
+    const hashedRefreshToken = await this.tokenService.hashToken(refreshToken);
+    await this.userRepository.updateRefreshToken(user.id, hashedRefreshToken);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
 }
