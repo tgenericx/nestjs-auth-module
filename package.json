@@ -1,6 +1,6 @@
 {
   "name": "@nahnah/nestjs-auth-module",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Reusable authentication module for NestJS",
   "author": "tgenericx",
   "license": "MIT",

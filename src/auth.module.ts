@@ -1,4 +1,4 @@
-import { DynamicModule, Module, Provider } from '@nestjs/common';
+import { DynamicModule, Module, Provider, Type } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './services/auth.service';
@@ -11,6 +11,12 @@ import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { IAuthModuleConfig } from './interfaces/auth-config.interface';
 import { AUTH_MODULE_CONFIG, USER_REPOSITORY, EMAIL_SERVICE } from './auth.constants';
+
+export interface AuthModuleAsyncOptions {
+  imports?: any[];
+  inject?: any[];
+  useFactory: (...args: any[]) => Promise<IAuthModuleConfig> | IAuthModuleConfig;
+}
 
 @Module({})
 export class AuthModule {
@@ -30,7 +36,6 @@ export class AuthModule {
       useExisting: config.emailService || null,
     };
 
-
     // Only add Google strategy if config is provided
     const strategies: Provider[] = [
       JwtStrategy,
@@ -49,9 +54,7 @@ export class AuthModule {
         PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.register({
           secret: config.jwt.secret,
-          signOptions: {
-            ...config.jwt.accessTokenSignOptions
-          },
+          signOptions: { ...config.jwt.accessTokenSignOptions },
         }),
       ],
       providers: [
@@ -69,6 +72,77 @@ export class AuthModule {
         TokenService,
         PasswordService,
         ...guards,
+      ],
+    };
+  }
+
+  static forRootAsync(options: AuthModuleAsyncOptions): DynamicModule {
+    const asyncConfigProvider: Provider = {
+      provide: AUTH_MODULE_CONFIG,
+      useFactory: options.useFactory,
+      inject: options.inject || [],
+    };
+
+    return {
+      module: AuthModule,
+      imports: [
+        ...(options.imports || []),
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        JwtModule.registerAsync({
+          imports: options.imports,
+          inject: options.inject,
+          useFactory: async (...args: any[]) => {
+            const config = await options.useFactory(...args);
+            return {
+              secret: config.jwt.secret,
+              signOptions: { ...config.jwt.accessTokenSignOptions },
+            };
+          },
+        }),
+      ],
+      providers: [
+        asyncConfigProvider,
+        {
+          provide: USER_REPOSITORY,
+          useFactory: async (...args: any[]) => {
+            const config = await options.useFactory(...args);
+            return config.userRepository;
+          },
+          inject: options.inject || [],
+        },
+        {
+          provide: EMAIL_SERVICE,
+          useFactory: async (...args: any[]) => {
+            const config = await options.useFactory(...args);
+            return config.emailService || null;
+          },
+          inject: options.inject || [],
+        },
+        AuthService,
+        TokenService,
+        PasswordService,
+        JwtStrategy,
+        JwtAuthGuard,
+        RolesGuard,
+        // Conditionally add Google strategy via a factory
+        {
+          provide: 'GOOGLE_STRATEGY_FACTORY',
+          useFactory: async (...args: any[]) => {
+            const config = await options.useFactory(...args);
+            if (config.google) {
+              return GoogleStrategy;
+            }
+            return null;
+          },
+          inject: options.inject || [],
+        },
+      ],
+      exports: [
+        AuthService,
+        TokenService,
+        PasswordService,
+        JwtAuthGuard,
+        RolesGuard,
       ],
     };
   }
