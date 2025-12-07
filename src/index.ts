@@ -3,6 +3,7 @@ export * from './services/auth.service';
 export * from './services/token.service';
 export * from './services/password.service';
 export * from './guards/jwt-auth.guard';
+export * from './guards/google-auth.guard';
 export * from './guards/roles.guard';
 export * from './decorators/current-user.decorator';
 export * from './decorators/public.decorator';

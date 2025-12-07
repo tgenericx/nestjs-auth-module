@@ -5,7 +5,9 @@ import { AuthService } from './services/auth.service';
 import { TokenService } from './services/token.service';
 import { PasswordService } from './services/password.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { IAuthModuleConfig } from './interfaces/auth-config.interface';
 import { AUTH_MODULE_CONFIG, USER_REPOSITORY, EMAIL_SERVICE } from './auth.constants';
@@ -28,6 +30,19 @@ export class AuthModule {
       useExisting: config.emailService || null,
     };
 
+
+    // Only add Google strategy if config is provided
+    const strategies: Provider[] = [
+      JwtStrategy,
+      ...(config.google ? [GoogleStrategy] : []),
+    ];
+
+    const guards: Provider[] = [
+      JwtAuthGuard,
+      RolesGuard,
+      ...(config.google ? [GoogleAuthGuard] : []),
+    ];
+
     return {
       module: AuthModule,
       imports: [
@@ -46,16 +61,14 @@ export class AuthModule {
         AuthService,
         TokenService,
         PasswordService,
-        JwtStrategy,
-        JwtAuthGuard,
-        RolesGuard,
+        ...strategies,
+        ...guards,
       ],
       exports: [
         AuthService,
         TokenService,
         PasswordService,
-        JwtAuthGuard,
-        RolesGuard,
+        ...guards,
       ],
     };
   }
