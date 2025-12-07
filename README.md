@@ -248,6 +248,15 @@ async adminRoute() {
 }
 ```
 
+### 🎨 Available Decorators
+
+| Decorator            | Description                  | Example                                   |
+|----------------------|------------------------------|-------------------------------------------|
+| `@CurrentUser()`     | Get authenticated user       | `@CurrentUser() user`                     |
+| `@CurrentUser('id')` | Get specific user property   | `@CurrentUser('id') userId: string`       |
+| `@Public()`          | Mark route as public         | `@Public() @Get('health')`                |
+| `@Roles(...roles)`   | Require specific roles       | `@Roles('admin', 'moderator')`            |
+
 ## Services
 
 * **AuthService** — Registration, login, refresh tokens, logout, Google login
