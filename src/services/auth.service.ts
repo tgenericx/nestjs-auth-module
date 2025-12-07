@@ -58,7 +58,15 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await this.passwordService.compare(dto.password, user.passwordHash);
+    if (!user.passwordHash) {
+      throw new UnauthorizedException('Please log in using Google');
+    }
+
+    const isPasswordValid = await this.passwordService.compare(
+      dto.password,
+      user.passwordHash,
+    );
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
