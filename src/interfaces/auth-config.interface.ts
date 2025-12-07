@@ -13,9 +13,16 @@ export interface IPasswordConfig {
   requireUppercase?: boolean;
 }
 
+export interface IGoogleOAuthConfig {
+  clientID: string;
+  clientSecret: string;
+  callbackURL: string;
+}
+
 export interface IAuthModuleConfig {
   jwt: IJwtConfig;
   password?: IPasswordConfig;
+  google?: IGoogleOAuthConfig;
   userRepository: any; // Provider token
   emailService?: any; // Provider token (optional)
 }
