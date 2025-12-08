@@ -17,17 +17,23 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           registry-url: "https://registry.npmjs.org"
 
-      # Ensure npm 11.5.1 or later is installed
-      - name: Update npm
-        run: npm install -g npm@latest
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npm publish --access public
+      # Setup pnpm
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: true
+
+      # Build (if you have a build script)
+      - run: pnpm run build --if-present
+
+      # Publish with pnpm
+      - name: Publish package
+        run: pnpm publish --access public --no-git-checks
