@@ -1,4 +1,4 @@
-import { DynamicModule, Module, Provider, Type } from '@nestjs/common';
+import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './services/auth.service';
@@ -12,136 +12,120 @@ import { RolesGuard } from './guards/roles.guard';
 import { IAuthModuleConfig } from './interfaces/auth-config.interface';
 import { AUTH_MODULE_CONFIG, USER_REPOSITORY, EMAIL_SERVICE } from './auth.constants';
 
+export interface AuthModuleOptions {
+  config: IAuthModuleConfig;
+  userRepository: Provider;
+  emailService?: Provider;
+}
+
 export interface AuthModuleAsyncOptions {
   imports?: any[];
-  inject?: any[];
   useFactory: (...args: any[]) => Promise<IAuthModuleConfig> | IAuthModuleConfig;
+  inject?: any[];
+  userRepository: Provider;
+  emailService?: Provider;
 }
 
 @Module({})
 export class AuthModule {
-  static forRoot(config: IAuthModuleConfig): DynamicModule {
-    const configProvider: Provider = {
-      provide: AUTH_MODULE_CONFIG,
-      useValue: config,
-    };
-
-    const userRepositoryProvider: Provider = {
-      provide: USER_REPOSITORY,
-      useExisting: config.userRepository,
-    };
-
-    const emailServiceProvider: Provider = {
-      provide: EMAIL_SERVICE,
-      useExisting: config.emailService || null,
-    };
-
-    // Only add Google strategy if config is provided
-    const strategies: Provider[] = [
+  static forRoot(options: AuthModuleOptions): DynamicModule {
+    const providers: Provider[] = [
+      {
+        provide: AUTH_MODULE_CONFIG,
+        useValue: options.config,
+      },
+      options.userRepository,
+      options.emailService || {
+        provide: EMAIL_SERVICE,
+        useValue: null,
+      },
+      AuthService,
+      TokenService,
+      PasswordService,
       JwtStrategy,
-      ...(config.google ? [GoogleStrategy] : []),
-    ];
-
-    const guards: Provider[] = [
       JwtAuthGuard,
       RolesGuard,
-      ...(config.google ? [GoogleAuthGuard] : []),
     ];
+
+    // Only add Google strategy if Google config is provided
+    if (options.config.google) {
+      providers.push(GoogleStrategy);
+      providers.push(GoogleAuthGuard);
+    }
 
     return {
       module: AuthModule,
       imports: [
         PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.register({
-          secret: config.jwt.secret,
-          signOptions: { ...config.jwt.accessTokenSignOptions },
+          secret: options.config.jwt.secret,
+          signOptions: { ...options.config.jwt.accessTokenSignOptions },
         }),
       ],
-      providers: [
-        configProvider,
-        userRepositoryProvider,
-        emailServiceProvider,
-        AuthService,
-        TokenService,
-        PasswordService,
-        ...strategies,
-        ...guards,
-      ],
+      providers,
       exports: [
         AuthService,
         TokenService,
         PasswordService,
-        ...guards,
+        JwtAuthGuard,
+        RolesGuard,
+        ...(options.config.google ? [GoogleAuthGuard] : []),
+        JwtModule,
       ],
     };
   }
 
   static forRootAsync(options: AuthModuleAsyncOptions): DynamicModule {
+    const providers: Provider[] = [
+      {
+        provide: AUTH_MODULE_CONFIG,
+        useFactory: options.useFactory,
+        inject: options.inject || [],
+      },
+      options.userRepository,
+      options.emailService || {
+        provide: EMAIL_SERVICE,
+        useValue: null,
+      },
+      AuthService,
+      TokenService,
+      PasswordService,
+      JwtStrategy,
+      JwtAuthGuard,
+      RolesGuard,
+    ];
+
+    providers.push(GoogleStrategy);
+    providers.push(GoogleAuthGuard);
+
+    const jwtModule = JwtModule.registerAsync({
+      imports: options.imports || [],
+      useFactory: async (...args: any[]) => {
+        const config = await options.useFactory(...args);
+        return {
+          secret: config.jwt.secret,
+          signOptions: { ...config.jwt.accessTokenSignOptions },
+        };
+      },
+      inject: options.inject || [],
+    });
+
     return {
       module: AuthModule,
       imports: [
-        ...(options.imports || []),
         PassportModule.register({ defaultStrategy: 'jwt' }),
-        JwtModule.registerAsync({
-          imports: options.imports,
-          inject: options.inject,
-          useFactory: async (...args: any[]) => {
-            const config = await options.useFactory(...args);
-            return {
-              secret: config.jwt.secret,
-              signOptions: { ...config.jwt.accessTokenSignOptions },
-            };
-          },
-        }),
+        jwtModule,
+        ...(options.imports || []),
       ],
-      providers: [
-        {
-          provide: AUTH_MODULE_CONFIG,
-          useFactory: options.useFactory,
-          inject: options.inject || [],
-        },
-        {
-          provide: USER_REPOSITORY,
-          useFactory: async (...args: any[]) => {
-            const config = await options.useFactory(...args);
-            return config.userRepository;
-          },
-          inject: options.inject || [],
-        },
-        {
-          provide: EMAIL_SERVICE,
-          useFactory: async (...args: any[]) => {
-            const config = await options.useFactory(...args);
-            return config.emailService || null;
-          },
-          inject: options.inject || [],
-        },
-        AuthService,
-        TokenService,
-        PasswordService,
-        JwtStrategy,
-        JwtAuthGuard,
-        RolesGuard,
-        // Only provide GoogleStrategy if google config exists
-        {
-          provide: GoogleStrategy,
-          useFactory: async (config: IAuthModuleConfig) => {
-            if (config.google) {
-              return new GoogleStrategy(config);
-            }
-            return null;
-          },
-          inject: [AUTH_MODULE_CONFIG],
-        },
-        GoogleAuthGuard,
-      ],
+      providers,
       exports: [
         AuthService,
         TokenService,
         PasswordService,
         JwtAuthGuard,
-        GoogleAuthGuard,
         RolesGuard,
+        GoogleAuthGuard,
+        JwtModule,
       ],
     };
   }

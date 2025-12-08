@@ -23,6 +23,4 @@ export interface IAuthModuleConfig {
   jwt: IJwtConfig;
   password?: IPasswordConfig;
   google?: IGoogleOAuthConfig;
-  userRepository: any; // Provider token
-  emailService?: any; // Provider token (optional)
 }

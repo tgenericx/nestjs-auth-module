@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { randomBytes } from 'crypto';
-import { IPasswordConfig } from 'src/interfaces/auth-config.interface';
+import { IPasswordConfig } from '../interfaces/auth-config.interface';
 
 @Injectable()
 export class PasswordService {
