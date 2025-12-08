@@ -48,10 +48,18 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tgenericx/nestjs-auth-module.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tgenericx/nestjs-auth-module/issues"
+  },
+  "homepage": "https://github.com/tgenericx/nestjs-auth-module#readme",
+  "packageManager": "pnpm@10.20.0",
   "publishConfig": {
     "access": "public"
   },
-  "packageManager": "pnpm@10.20.0",
   "keywords": [
     "nestjs",
     "auth",
