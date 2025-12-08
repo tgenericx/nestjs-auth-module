@@ -1,6 +1,27 @@
 # @nahnah/nestjs-auth-module
 
-A flexible, production-ready authentication module for NestJS applications. This module provides JWT-based authentication with optional Google OAuth integration, password hashing with Argon2, role-based authorization, and comprehensive token management.
+[![npm version](https://img.shields.io/npm/v/@nahnah/nestjs-auth-module)](https://www.npmjs.com/package/@nahnah/nestjs-auth-module)  
+[![License: MIT](https://img.shields.io/npm/l/@nahnah/nestjs-auth-module)](LICENSE)  
+[![Downloads](https://img.shields.io/npm/dt/@nahnah/nestjs-auth-module)](https://www.npmjs.com/package/@nahnah/nestjs-auth-module)  
+[![GitHub stars](https://img.shields.io/github/stars/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/stargazers)  
+[![GitHub issues](https://img.shields.io/github/issues/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/issues)  
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/pulls)  
+[![CI status](https://img.shields.io/github/actions/workflow/status/tgenericx/nestjs-auth-module/ci.yml?branch=main)](https://github.com/tgenericx/nestjs-auth-module/actions)  
+[![Coverage status](https://img.shields.io/codecov/c/github/tgenericx/nestjs-auth-module)](https://codecov.io/gh/tgenericx/nestjs-auth-module)  
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-⭐-blue)](https://www.typescriptlang.org/)  
+[![NestJS](https://img.shields.io/badge/NestJS-⭐-red)](https://nestjs.com/)  
+[![JWT](https://img.shields.io/badge/JWT-⭐-yellowgreen)](https://jwt.io/)  
+[![Passport](https://img.shields.io/badge/Passport-⭐-blueviolet)](http://www.passportjs.org/)  
+[![Node.js](https://img.shields.io/badge/Node.js-⭐-green)](https://nodejs.org/)  
+
+---
+
+## Overview
+
+`@nahnah/nestjs-auth-module` is a plug-and-play authentication module for NestJS that supports JWT-based access and refresh tokens, secure password hashing with Argon2, optional Google OAuth flow, role-based authorization, and a clean interface-based design so you can plug in your own user repo and email service. Ideal for rapid setup of authentication in production-grade applications.
+
+---
 
 ## Features
 
@@ -302,25 +323,78 @@ import { JwtAuthGuard } from '@nahnah/nestjs-auth-module';
 export class CustomAuthGuard extends JwtAuthGuard {}
 ```
 
-## Security Considerations
+---
 
-1. Use strong JWT secrets
-2. Set reasonable token expirations
-3. Rate-limit auth endpoints
-4. Use HTTPS
-5. Consider IP whitelisting and device fingerprinting
-6. Store refresh tokens securely
+## ⚙️ Configuration
 
-## Development
+When importing the module, you must provide a configuration object with the following options:
 
-```bash
-git clone <repository-url>
-pnpm install
-pnpm run build
-pnpm test
+```ts
+AuthModule.forRootAsync({
+  imports: [...],
+  inject: [...],
+  useFactory: async (...args) => ({ /* IAuthModuleConfig */ }),
+  userRepository: Provider,
+  emailService?: Provider,
+});
 ```
 
-## License
 
-MIT
+---
 
+## 🧠 Project Structure (for contributors)
+
+```
+src/
+├── auth.constants.ts
+├── auth.module.ts
+├── decorators/
+│   ├── current-user.decorator.ts
+│   ├── public.decorator.ts
+│   └── roles.decorator.ts
+├── dto/
+│   ├── jwt-payload.dto.ts
+│   ├── login.dto.ts
+│   ├── refresh-token.dto.ts
+│   ├── register.dto.ts
+│   └── token-response.dto.ts
+├── guards/
+│   ├── google-auth.guard.ts
+│   ├── jwt-auth.guard.ts
+│   └── roles.guard.ts
+├── interfaces/
+│   ├── auth-config.interface.ts
+│   ├── auth-user.interface.ts
+│   ├── email-service.interface.ts
+│   └── user-repository.interface.ts
+├── services/
+│   ├── auth.service.ts
+│   ├── password.service.ts
+│   └── token.service.ts
+├── strategies/
+│   ├── google.strategy.ts
+│   └── jwt.strategy.ts
+└── index.ts
+```
+
+This layout makes it easy to navigate — from core module config → to services, guards, decorators, and interfaces.
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and pull requests are welcome!  
+Feel free to open an issue or submit a PR; please follow code style, write tests, and update documentation as needed.
+
+---
+
+## 🪪 License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+## ⭐ Support / Feedback
+
+If this module helped you, a ⭐ on the repository is always appreciated 😉  
+Open issues or PRs on GitHub if you run into bugs or want to suggest improvements.
