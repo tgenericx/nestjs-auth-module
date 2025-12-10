@@ -100,6 +100,20 @@ export class AuthService {
       throw new UnauthorizedException('Invalid token');
     }
 
+    // Validate refresh token against stored hash
+    if (!user.hashedRefreshToken) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    const isRefreshTokenValid = await this.tokenService.compareToken(
+      refreshToken,
+      user.hashedRefreshToken,
+    );
+
+    if (!isRefreshTokenValid) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
     // Generate new tokens
     const newAccessToken = this.tokenService.generateAccessToken(user);
     const newRefreshToken = this.tokenService.generateRefreshToken(user);
