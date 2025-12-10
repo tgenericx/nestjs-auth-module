@@ -1,4 +1,3 @@
-export * from './auth.constants';
 export * from './auth.module';
 export * from './services/auth.service';
 export * from './services/token.service';
