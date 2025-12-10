@@ -195,8 +195,20 @@ export class AuthModule {
       JwtStrategy,
       JwtAuthGuard,
       RolesGuard,
-      GoogleStrategy,
-      GoogleAuthGuard,
+      {
+        provide: GoogleStrategy,
+        useFactory: (config: IAuthModuleConfig) => {
+          return config.google ? new GoogleStrategy(config) : null;
+        },
+        inject: [AUTH_MODULE_CONFIG],
+      },
+      {
+        provide: GoogleAuthGuard,
+        useFactory: (config: IAuthModuleConfig) => {
+          return config.google ? new GoogleAuthGuard() : null;
+        },
+        inject: [AUTH_MODULE_CONFIG],
+      },
     ];
 
     const jwtModule = JwtModule.registerAsync({
