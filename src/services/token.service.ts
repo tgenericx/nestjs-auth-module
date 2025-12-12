@@ -1,5 +1,5 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { JwtPayloadDto } from '../dto/jwt-payload.dto';
 import { IAuthUser } from '../interfaces/auth-user.interface';
@@ -38,13 +38,19 @@ export class TokenService {
 
   async verifyToken(token: string, isRefreshToken: boolean = false): Promise<JwtPayloadDto> {
     try {
-      // Use appropriate secret based on token type
-      const secret = isRefreshToken ? this.config.jwt.refreshTokenSignOptions.secret
-        : this.config.jwt.accessTokenSignOptions.secret;
+      const signOptions = isRefreshToken
+        ? this.config.jwt.refreshTokenSignOptions
+        : this.config.jwt.accessTokenSignOptions;
 
-      return this.jwtService.verify(token, {
-        secret,
-      });
+      const verifyOptions: JwtVerifyOptions = {
+        secret: signOptions.secret,
+        algorithms: signOptions.algorithm ? [signOptions.algorithm] : undefined,
+        audience: signOptions.audience as any,
+        issuer: signOptions.issuer,
+        ignoreExpiration: false,
+      };
+
+      return this.jwtService.verify(token, verifyOptions);
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
     }
