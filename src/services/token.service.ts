@@ -1,5 +1,6 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as argon2 from 'argon2';
 import { JwtPayloadDto } from '../dto/jwt-payload.dto';
 import { IAuthUser } from '../interfaces/auth-user.interface';
 import { AUTH_MODULE_CONFIG } from '../auth.constants';
@@ -48,12 +49,10 @@ export class TokenService {
   }
 
   async hashToken(token: string): Promise<string> {
-    const argon2 = require('argon2');
     return argon2.hash(token);
   }
 
   async compareToken(token: string, hash: string): Promise<boolean> {
-    const argon2 = require('argon2');
     try {
       return await argon2.verify(hash, token);
     } catch (error) {
