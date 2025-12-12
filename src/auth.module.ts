@@ -13,18 +13,26 @@ import { IAuthModuleConfig } from './interfaces/auth-config.interface';
 import { IUserRepository } from './interfaces/user-repository.interface';
 import { IEmailService } from './interfaces/email-service.interface';
 import { AUTH_MODULE_CONFIG, USER_REPOSITORY, EMAIL_SERVICE } from './auth.constants';
+import { validateJwtConfig } from './utils/token-validation.utils';
 
 /**
  * Options for registering the Auth module synchronously
- * 
+ *
  * @example
  * ```typescript
  * AuthModule.forRoot({
  *   config: {
  *     jwt: {
- *       secret: process.env.JWT_SECRET,
- *       accessTokenSignOptions: { expiresIn: '15m' },
- *       refreshTokenSignOptions: { expiresIn: '7d' }
+ *       accessTokenSignOptions: {
+ *          secret: configService.get('JWT_SECRET'),
+ *         expiresIn: '15m',
+ *         audience: 'api'
+ *       },
+ *       refreshTokenSignOptions: {
+ *          secret: configService.get('REFRESH_SECRET'),
+ *         expiresIn: '7d',
+ *         audience: 'refresh'
+ *       }
  *     }
  *   },
  *   userRepository: UserService,
@@ -36,13 +44,13 @@ export interface AuthModuleOptions {
   /** JWT and authentication configuration */
   config: IAuthModuleConfig;
 
-  /** 
+  /**
    * Service class that implements IUserRepository interface
    * This service must be decorated with @Injectable()
    */
   userRepository: Type<IUserRepository>;
 
-  /** 
+  /**
    * Optional service class that implements IEmailService interface
    * This service must be decorated with @Injectable()
    */
@@ -52,16 +60,23 @@ export interface AuthModuleOptions {
 /**
  * Options for registering the Auth module asynchronously
  * Useful when configuration depends on other modules or async operations
- * 
+ *
  * @example
  * ```typescript
  * AuthModule.forRootAsync({
  *   imports: [ConfigModule],
  *   useFactory: (configService: ConfigService) => ({
  *     jwt: {
- *       secret: configService.get('JWT_SECRET'),
- *       accessTokenSignOptions: { expiresIn: '15m' },
- *       refreshTokenSignOptions: { expiresIn: '7d' }
+ *       accessTokenSignOptions: {
+ *          secret: configService.get('JWT_SECRET'),
+ *         expiresIn: '15m',
+ *         audience: 'api'
+ *       },
+ *       refreshTokenSignOptions: {
+ *          secret: configService.get('REFRESH_SECRET'),
+ *         expiresIn: '7d',
+ *         audience: 'refresh'
+ *       }
  *     }
  *   }),
  *   inject: [ConfigService],
@@ -74,7 +89,7 @@ export interface AuthModuleAsyncOptions {
   /** Modules to import that are required by the factory */
   imports?: any[];
 
-  /** 
+  /**
    * Factory function that returns auth configuration
    * Can be async if configuration requires async operations
    */
@@ -83,13 +98,13 @@ export interface AuthModuleAsyncOptions {
   /** Dependencies to inject into the factory function */
   inject?: any[];
 
-  /** 
+  /**
    * Service class that implements IUserRepository interface
    * This service must be decorated with @Injectable()
    */
   userRepository: Type<IUserRepository>;
 
-  /** 
+  /**
    * Optional service class that implements IEmailService interface
    * This service must be decorated with @Injectable()
    */
@@ -144,7 +159,6 @@ export class AuthModule {
       imports: [
         PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.register({
-          secret: options.config.jwt.secret,
           signOptions: { ...options.config.jwt.accessTokenSignOptions },
         }),
       ],
@@ -173,7 +187,12 @@ export class AuthModule {
       // Config provider (async)
       {
         provide: AUTH_MODULE_CONFIG,
-        useFactory: options.useFactory,
+        useFactory: async (...args: any[]) => {
+          const config = await options.useFactory(...args);
+          // Validate config after it's resolved
+          validateJwtConfig(config.jwt);
+          return config;
+        },
         inject: options.inject || [],
       },
       {
@@ -216,7 +235,6 @@ export class AuthModule {
       useFactory: async (...args: any[]) => {
         const config = await options.useFactory(...args);
         return {
-          secret: config.jwt.secret,
           signOptions: { ...config.jwt.accessTokenSignOptions },
         };
       },
@@ -253,12 +271,18 @@ export class AuthModule {
     if (!options.config.jwt) {
       throw new Error('AuthModule: "config.jwt" is required');
     }
-    if (!options.config.jwt.secret) {
-      throw new Error('AuthModule: "config.jwt.secret" is required');
+    if (!options.config.jwt.refreshTokenSignOptions) {
+      throw new Error('AuthModule: "config.jwt.refreshTokenSignOptions" is required');
+    }
+    if (!options.config.jwt.accessTokenSignOptions) {
+      throw new Error('AuthModule: "config.jwt.accessTokenSignOptions" is required');
     }
     if (!options.userRepository) {
       throw new Error('AuthModule: "userRepository" is required');
     }
+
+    // Validate JWT configuration for security best practices
+    validateJwtConfig(options.config.jwt);
   }
 
   /**
