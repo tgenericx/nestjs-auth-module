@@ -21,7 +21,6 @@ export class TokenService {
     };
 
     return this.jwtService.sign(payload, {
-      secret: this.config.jwt.secret,
       ...this.config.jwt.accessTokenSignOptions
     });
   }
@@ -33,15 +32,18 @@ export class TokenService {
     };
 
     return this.jwtService.sign(payload, {
-      secret: this.config.jwt.secret,
       ...this.config.jwt.refreshTokenSignOptions
     });
   }
 
-  async verifyToken(token: string): Promise<JwtPayloadDto> {
+  async verifyToken(token: string, isRefreshToken: boolean = false): Promise<JwtPayloadDto> {
     try {
+      // Use appropriate secret based on token type
+      const secret = isRefreshToken ? this.config.jwt.refreshTokenSignOptions.secret
+        : this.config.jwt.accessTokenSignOptions.secret;
+
       return this.jwtService.verify(token, {
-        secret: this.config.jwt.secret,
+        secret,
       });
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
