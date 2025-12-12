@@ -1,19 +1,21 @@
 # @nahnah/nestjs-auth-module
 
-[![npm version](https://img.shields.io/npm/v/@nahnah/nestjs-auth-module)](https://www.npmjs.com/package/@nahnah/nestjs-auth-module)  
-[![License: MIT](https://img.shields.io/npm/l/@nahnah/nestjs-auth-module)](LICENSE)  
-[![Downloads](https://img.shields.io/npm/dt/@nahnah/nestjs-auth-module)](https://www.npmjs.com/package/@nahnah/nestjs-auth-module)  
-[![GitHub stars](https://img.shields.io/github/stars/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/stargazers)  
-[![GitHub issues](https://img.shields.io/github/issues/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/issues)  
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/pulls)  
-[![CI status](https://img.shields.io/github/actions/workflow/status/tgenericx/nestjs-auth-module/ci.yml?branch=main)](https://github.com/tgenericx/nestjs-auth-module/actions)  
-[![Coverage status](https://img.shields.io/codecov/c/github/tgenericx/nestjs-auth-module)](https://codecov.io/gh/tgenericx/nestjs-auth-module)  
+[![npm version](https://img.shields.io/npm/v/@nahnah/nestjs-auth-module)](https://www.npmjs.com/package/@nahnah/nestjs-auth-module)
+[![License: MIT](https://img.shields.io/npm/l/@nahnah/nestjs-auth-module)](LICENSE)
+[![Downloads](https://img.shields.io/npm/dt/@nahnah/nestjs-auth-module)](https://www.npmjs.com/package/@nahnah/nestjs-auth-module)
+[![GitHub stars](https://img.shields.io/github/stars/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/pulls)
+[![CI status](https://img.shields.io/github/actions/workflow/status/tgenericx/nestjs-auth-module/ci.yml?branch=main)](https://github.com/tgenericx/nestjs-auth-module/actions)
+[![Coverage status](https://img.shields.io/codecov/c/github/tgenericx/nestjs-auth-module)](https://codecov.io/gh/tgenericx/nestjs-auth-module)
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-⭐-blue)](https://www.typescriptlang.org/)  
-[![NestJS](https://img.shields.io/badge/NestJS-⭐-red)](https://nestjs.com/)  
-[![JWT](https://img.shields.io/badge/JWT-⭐-yellowgreen)](https://jwt.io/)  
-[![Passport](https://img.shields.io/badge/Passport-⭐-blueviolet)](http://www.passportjs.org/)  
-[![Node.js](https://img.shields.io/badge/Node.js-⭐-green)](https://nodejs.org/)  
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-⭐-blue)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-⭐-red)](https://nestjs.com/)
+[![JWT](https://img.shields.io/badge/JWT-⭐-yellowgreen)](https://jwt.io/)
+[![Passport](https://img.shields.io/badge/Passport-⭐-blueviolet)](http://www.passportjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-⭐-green)](https://nodejs.org/)
+
 
 ---
 
@@ -383,7 +385,7 @@ This layout makes it easy to navigate — from core module config → to service
 
 ## 🤝 Contributing
 
-Contributions, bug reports, and pull requests are welcome!  
+Contributions, bug reports, and pull requests are welcome!
 Feel free to open an issue or submit a PR; please follow code style, write tests, and update documentation as needed.
 
 ---
