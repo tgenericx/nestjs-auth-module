@@ -1,0 +1,90 @@
+import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import type { AuthUser, GoogleOAuthConfig, RequestUser, TokenPair, UserRepository } from "../interfaces";
+import { AUTH_CAPABILITIES, PROVIDERS } from "../constants";
+import { TokenService } from "../auth-jwt/token.service";
+
+export interface GoogleAuthResponse {
+  user: {
+    id: string;
+    email: string;
+    roles: string[];
+    isEmailVerified: boolean;
+  };
+  tokens: TokenPair;
+}
+
+@Injectable()
+export class GoogleAuthService<User extends Partial<AuthUser>> {
+  constructor(
+    @Inject(PROVIDERS.USER_REPOSITORY)
+    private readonly userRepository: UserRepository<User>,
+    private readonly tokenService: TokenService,
+    @Inject(AUTH_CAPABILITIES.GOOGLE)
+    private readonly config: GoogleOAuthConfig | undefined,
+  ) {
+    if (!config) {
+      throw new Error(
+        'GoogleOAuthModule is imported but Google config is not provided. ' +
+        'Either remove the module or provide google config in AuthModule.forRootAsync()'
+      );
+    }
+  }
+
+  /**
+   * Complete the Google OAuth flow by generating JWT tokens.
+   * Call this in your callback controller after Passport attaches user to request.
+   */
+  async handleOAuthCallback(requestUser: RequestUser): Promise<GoogleAuthResponse> {
+    // Fetch full user data
+    const user = await this.userRepository.findById(requestUser.userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found after OAuth');
+    }
+
+    // Generate JWT tokens
+    const tokens = this.tokenService.generateTokens(user as AuthUser);
+
+    return {
+      user: {
+        id: user.id!,
+        email: user.email!,
+        roles: user.roles!,
+        isEmailVerified: user.isEmailVerified!,
+      },
+      tokens,
+    };
+  }
+
+  /**
+   * Unlink Google account from user.
+   * Useful if user wants to remove Google login but keep password login.
+   */
+  async unlinkGoogleAccount(userId: string): Promise<{ message: string }> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    // Check if user has another way to login
+    if (!user.password && user.googleId) {
+      throw new UnauthorizedException(
+        'Cannot unlink Google account. Please set a password first.'
+      );
+    }
+
+    // Unlink Google
+    await this.userRepository.update(userId, {
+      googleId: null,
+    } as Partial<User>);
+
+    return { message: 'Google account unlinked successfully' };
+  }
+
+  /**
+   * Check if a user has Google OAuth linked.
+   */
+  async isGoogleLinked(userId: string): Promise<boolean> {
+    const user = await this.userRepository.findById(userId);
+    return !!(user?.googleId);
+  }
+}
