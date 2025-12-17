@@ -8,7 +8,6 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/pulls)
 [![CI status](https://img.shields.io/github/actions/workflow/status/tgenericx/nestjs-auth-module/ci.yml?branch=main)](https://github.com/tgenericx/nestjs-auth-module/actions)
 [![Coverage status](https://img.shields.io/codecov/c/github/tgenericx/nestjs-auth-module)](https://codecov.io/gh/tgenericx/nestjs-auth-module)
-
 [![TypeScript](https://img.shields.io/badge/TypeScript-⭐-blue)](https://www.typescriptlang.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-⭐-red)](https://nestjs.com/)
 [![JWT](https://img.shields.io/badge/JWT-⭐-yellowgreen)](https://jwt.io/)
