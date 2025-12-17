@@ -36,7 +36,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
     if (!config) {
       throw new Error(
         'CredentialsAuthModule is imported but credentials config is not provided. ' +
-          'Either remove the module or provide credentials config in AuthModule.forRootAsync()',
+        'Either remove the module or provide credentials config in AuthModule.forRootAsync()',
       );
     }
   }
@@ -215,24 +215,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
       throw new UnauthorizedException('User not found');
     }
 
-    // Add more validation here if needed (e.g., check if banned, suspended, etc.)
-
     return user;
-  }
-
-  async refreshToken(refreshToken: string): Promise<TokenPair> {
-    try {
-      const payload = await this.tokenService.verifyRefreshToken(refreshToken);
-      const user = await this.userRepository.findById(payload.sub);
-
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-
-      return this.tokenService.generateTokens(user as AuthUser);
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
   }
 
   // TODO: Implement request password reset.

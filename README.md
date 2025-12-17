@@ -109,12 +109,6 @@ import { UserRepository } from './user.repository';
         accessTokenSignOptions: { expiresIn: '15m' },
         refreshTokenSignOptions: { expiresIn: '7d' },
       },
-      password: {
-        minLength: 8,
-        requireSpecialChar: true,
-        requireNumber: true,
-        requireUppercase: true,
-      },
       userRepository: UserRepository,
       // google: {
       //   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -223,12 +217,6 @@ interface IAuthModuleConfig {
     accessTokenSignOptions: JwtSignOptions;
     refreshTokenSignOptions: JwtSignOptions;
   };
-  password?: {
-    minLength?: number;
-    requireSpecialChar?: boolean;
-    requireNumber?: boolean;
-    requireUppercase?: boolean;
-  };
   google?: {
     clientID: string;
     clientSecret: string;
@@ -286,7 +274,6 @@ async adminRoute() {
 
 ## Services
 
-- **AuthService** — Registration, login, refresh tokens, logout, Google login
 - **TokenService** — Token generation & verification
 - **PasswordService** — Argon2 hashing and validation
 
@@ -347,42 +334,9 @@ AuthModule.forRootAsync({
 
 ---
 
-## 🧠 Project Structure (for contributors)
-
-```
-src/
-├── auth.constants.ts
-├── auth.module.ts
-├── decorators/
-│   ├── current-user.decorator.ts
-│   ├── public.decorator.ts
-│   └── roles.decorator.ts
-├── dto/
-│   ├── jwt-payload.dto.ts
-│   ├── login.dto.ts
-│   ├── refresh-token.dto.ts
-│   ├── register.dto.ts
-│   └── token-response.dto.ts
-├── guards/
-│   ├── google-auth.guard.ts
-│   ├── jwt-auth.guard.ts
-│   └── roles.guard.ts
-├── interfaces/
-│   ├── auth-config.interface.ts
-│   ├── auth-user.interface.ts
-│   ├── email-service.interface.ts
-│   └── user-repository.interface.ts
-├── services/
-│   ├── auth.service.ts
-│   ├── password.service.ts
-│   └── token.service.ts
-├── strategies/
-│   ├── google.strategy.ts
-│   └── jwt.strategy.ts
-└── index.ts
-```
-
-This layout makes it easy to navigate — from core module config → to services, guards, decorators, and interfaces.
+## Todo
+- [ ] Refresh token Management
+- [ ] Proper Emailing
 
 ---
 
