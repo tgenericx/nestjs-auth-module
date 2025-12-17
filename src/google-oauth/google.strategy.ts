@@ -30,41 +30,37 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
       ...config,
       scope: config.scope || ['email', 'profile'],
       passReqToCallback: config.passReqToCallback || false,
-    ): Promise<any> {
-      try {
-        const { id, emails } = profile;
-        const email = emails?.[0]?.value;
+    });
+  }
 
-        if (!email) {
-          return done(new Error('No email found in Google profile'));
-        }
+  async validate(
+    _accessToken: string,
+    _refreshToken: string,
+    profile: Profile,
+    done: VerifyCallback,
+  ): Promise<any> {
+    const { id, emails } = profile;
+    const email = emails?.[0]?.value;
 
-        let user: Pick<User, 'id' | 'roles'> | null = await this.user.findByGoogleId(id);
+    if (!email) {
+      return done(new Error('No email found in Google profile'));
+    }
 
-        if (!user) {
-          user = await this.user.findByEmail(email);
-          if (user) {
-            user = await this.user.update(
-              user.id,
-              { googleId: id } as Partial<User>,
-            );
-          } else {
-            user = await this.user.create({
-              email,
-              googleId: id,
-              isEmailVerified: true,
-            } as Partial<User>
-            );
-          }
-        }
-        const requestUser: RequestUser = {
-          userId: user.id,
-          roles: user.roles
-        }
+    let user: Pick<User, 'id' | 'roles'> | null =
+      await this.user.findByGoogleId(id);
 
-        done(null, requestUser);
-      } catch (error) {
-        done(error);
+    if (!user) {
+      user = await this.user.findByEmail(email);
+      if (user) {
+        user = await this.user.update(user.id, {
+          googleId: id,
+        } as Partial<User>);
+      } else {
+        user = await this.user.create({
+          email,
+          googleId: id,
+          isEmailVerified: true,
+        } as Partial<User>);
       }
     }
     const requestUser: RequestUser = {
