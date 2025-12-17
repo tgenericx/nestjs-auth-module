@@ -6,7 +6,7 @@ import { TokenService } from './token.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './roles.guard';
-import { JwtConfig } from 'src/interfaces';
+import { JwtConfig } from '../interfaces';
 
 @Module({})
 export class AuthJwtModule {

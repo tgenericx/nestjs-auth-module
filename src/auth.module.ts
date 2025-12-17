@@ -34,26 +34,54 @@ export class AuthModule {
 
     const credentialsConfigProvider: Provider = {
       provide: AUTH_CAPABILITIES.CREDENTIALS,
-      useFactory: (config: AuthModuleConfig) => config.credentials,
+      useFactory: (config: AuthModuleConfig) =>
+        options.enabledCapabilities.includes('credentials') ? config.credentials : undefined,
       inject: [AUTH_CONFIG],
     };
 
     const googleConfigProvider: Provider = {
       provide: AUTH_CAPABILITIES.GOOGLE,
-      useFactory: (config: AuthModuleConfig) => config.google,
+      useFactory: (config: AuthModuleConfig) =>
+        options.enabledCapabilities.includes('google') ? config.google : undefined,
       inject: [AUTH_CONFIG],
     };
+
+    const imports = [
+      ...(options.imports || []),
+      AuthJwtModule.forRoot(),
+    ];
+
+    const exports = [
+      AUTH_CONFIG,
+      AUTH_CAPABILITIES.JWT,
+      PROVIDERS.USER_REPOSITORY,
+      AuthJwtModule,
+    ];
+
+    if (options.enabledCapabilities.includes('credentials')) {
+      imports.push(CredentialsAuthModule.forRoot());
+      exports.push(
+        AUTH_CAPABILITIES.CREDENTIALS,
+        CredentialsAuthModule,
+      );
+    } else {
+      exports.push(AUTH_CAPABILITIES.CREDENTIALS);
+    }
+
+    if (options.enabledCapabilities.includes('google')) {
+      imports.push(GoogleOAuthModule.forRoot());
+      exports.push(
+        AUTH_CAPABILITIES.GOOGLE,
+        GoogleOAuthModule,
+      );
+    } else {
+      exports.push(AUTH_CAPABILITIES.GOOGLE);
+    }
 
     return {
       module: AuthModule,
       global: true,
-      imports: [
-        ...(options.imports || []),
-        // Import child modules
-        AuthJwtModule.forRoot(),
-        CredentialsAuthModule.forRoot(),
-        GoogleOAuthModule.forRoot(),
-      ],
+      imports,
       providers: [
         configProvider,
         userRepositoryProvider,
@@ -61,18 +89,7 @@ export class AuthModule {
         credentialsConfigProvider,
         googleConfigProvider,
       ],
-      exports: [
-        // Export all providers so child modules can access them
-        AUTH_CONFIG,
-        AUTH_CAPABILITIES.JWT,
-        AUTH_CAPABILITIES.CREDENTIALS,
-        AUTH_CAPABILITIES.GOOGLE,
-        PROVIDERS.USER_REPOSITORY,
-        // Also export child module services for consumers
-        AuthJwtModule,
-        CredentialsAuthModule,
-        GoogleOAuthModule,
-      ],
+      exports,
     };
   }
 }

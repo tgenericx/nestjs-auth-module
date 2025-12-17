@@ -7,7 +7,7 @@ import type {
   JwtConfig,
   JwtPayload,
   TokenPair,
-} from 'src/interfaces';
+} from '../interfaces';
 
 @Injectable()
 export class TokenService {
@@ -15,7 +15,7 @@ export class TokenService {
     private readonly jwtService: JwtService,
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly config: JwtConfig,
-  ) {}
+  ) { }
 
   generateAccessToken(user: BaseUser): string {
     const payload: JwtPayload = {
