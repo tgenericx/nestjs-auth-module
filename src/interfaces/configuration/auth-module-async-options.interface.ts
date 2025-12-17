@@ -1,7 +1,7 @@
 import { ModuleMetadata, FactoryProvider } from '@nestjs/common';
 import { Type } from '@nestjs/common';
-import { UserRepository } from '../user/user-repository.interface';
-import { AuthUser } from '../user/user.interface';
+import { AuthModuleConfig } from './auth-module-config.interface';
+import { AuthUser, UserRepository } from '../user-model';
 
 /**
  * Asynchronous configuration options for the AuthModule

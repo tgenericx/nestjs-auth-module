@@ -1,4 +1,4 @@
-import { BaseUser } from '../user/user.interface';
+import { BaseUser } from "../user-model";
 
 /**
  * Safe user data exposed in authentication responses

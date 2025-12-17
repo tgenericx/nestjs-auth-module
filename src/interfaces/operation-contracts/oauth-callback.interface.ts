@@ -1,5 +1,5 @@
-import { RequestUser } from '../user/request-user.interface';
-import { AuthResponse } from '../auth/auth-response.interface';
+import { AuthResponse } from "../authentication";
+import { RequestUser } from "../user-model";
 
 /**
  * Response from Google OAuth callback operation

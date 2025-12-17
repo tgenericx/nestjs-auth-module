@@ -1,4 +1,4 @@
-import { BaseUser } from '../user/user.interface';
+import { BaseUser } from '../user-model';
 import { TokenPair } from './token-pair.interface';
 
 /**
