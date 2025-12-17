@@ -1,4 +1,4 @@
-export * from './interfaces'
+export * from './interfaces';
 export * from './auth.module';
 
 export * from './auth-jwt/decorators/public.decorator';

@@ -1,11 +1,19 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20';
-import type { AuthUser, GoogleOAuthConfig, RequestUser, UserRepository } from '../interfaces';
+import type {
+  AuthUser,
+  GoogleOAuthConfig,
+  RequestUser,
+  UserRepository,
+} from '../interfaces';
 import { AUTH_CAPABILITIES, PROVIDERS } from '../constants/tokens';
 
 @Injectable()
-export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(Strategy, 'google') {
+export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
+  Strategy,
+  'google',
+) {
   constructor(
     @Inject(AUTH_CAPABILITIES.GOOGLE)
     private readonly config: GoogleOAuthConfig | undefined,
@@ -15,7 +23,7 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(Stra
     if (!config) {
       throw new Error(
         'GoogleOAuthModule is imported but Google config is not provided. ' +
-        'Either remove the module or provide google config in AuthModule.forRootAsync()'
+          'Either remove the module or provide google config in AuthModule.forRootAsync()',
       );
     }
     super({
@@ -38,28 +46,27 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(Stra
       return done(new Error('No email found in Google profile'));
     }
 
-    let user: Pick<User, 'id' | 'roles'> | null = await this.user.findByGoogleId(id);
+    let user: Pick<User, 'id' | 'roles'> | null =
+      await this.user.findByGoogleId(id);
 
     if (!user) {
       user = await this.user.findByEmail(email);
       if (user) {
-        user = await this.user.update(
-          user.id,
-          { googleId: id } as Partial<User>,
-        );
+        user = await this.user.update(user.id, {
+          googleId: id,
+        } as Partial<User>);
       } else {
         user = await this.user.create({
           email,
           googleId: id,
           isEmailVerified: true,
-        } as Partial<User>
-        );
+        } as Partial<User>);
       }
     }
     const requestUser: RequestUser = {
       userId: user.id,
-      roles: user.roles
-    }
+      roles: user.roles,
+    };
 
     done(null, requestUser);
   }

@@ -7,14 +7,8 @@ export class CredentialsAuthModule {
   static forRoot(): DynamicModule {
     return {
       module: CredentialsAuthModule,
-      providers: [
-        PasswordService,
-        CredentialsAuthService,
-      ],
-      exports: [
-        CredentialsAuthService,
-        PasswordService,
-      ],
+      providers: [PasswordService, CredentialsAuthService],
+      exports: [CredentialsAuthService, PasswordService],
     };
   }
 }

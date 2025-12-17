@@ -1,4 +1,4 @@
-import { BaseUser } from "../user-model/user.interface";
+import { BaseUser } from '../user-model/user.interface';
 
 /**
  * Input data required for login operation

@@ -8,7 +8,8 @@ import { AuthUser, UserRepository } from '../user-model';
  * Allows consumers to provide configuration via factories
  */
 export interface AuthModuleAsyncOptions<User extends Partial<AuthUser> = any>
-  extends Pick<ModuleMetadata, 'imports'>,
-  Pick<FactoryProvider<AuthModuleConfig>, 'useFactory' | 'inject'> {
+  extends
+    Pick<ModuleMetadata, 'imports'>,
+    Pick<FactoryProvider<AuthModuleConfig>, 'useFactory' | 'inject'> {
   userRepository: Type<UserRepository<User>>;
 }

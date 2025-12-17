@@ -1,7 +1,13 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { AUTH_CAPABILITIES } from '../constants';
-import type { AuthUser, BaseUser, JwtConfig, JwtPayload, TokenPair } from 'src/interfaces';
+import type {
+  AuthUser,
+  BaseUser,
+  JwtConfig,
+  JwtPayload,
+  TokenPair,
+} from 'src/interfaces';
 
 @Injectable()
 export class TokenService {
@@ -9,7 +15,7 @@ export class TokenService {
     private readonly jwtService: JwtService,
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly config: JwtConfig,
-  ) { }
+  ) {}
 
   generateAccessToken(user: BaseUser): string {
     const payload: JwtPayload = {
@@ -41,7 +47,7 @@ export class TokenService {
     try {
       return await this.jwtService.verifyAsync<JwtPayload>(
         token,
-        this.config.accessTokenSignOptions as JwtVerifyOptions
+        this.config.accessTokenSignOptions as JwtVerifyOptions,
       );
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
@@ -58,9 +64,8 @@ export class TokenService {
     try {
       return await this.jwtService.verifyAsync<{ sub: string }>(
         token,
-        this.config.refreshTokenSignOptions as JwtVerifyOptions
+        this.config.refreshTokenSignOptions as JwtVerifyOptions,
       );
-
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Refresh token has expired');

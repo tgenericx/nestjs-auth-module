@@ -10,7 +10,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly config: JwtConfig,
   ) {
-    const secretOrKeyProvider: SecretOrKeyProvider = (request, rawJwtToken, done) => {
+    const secretOrKeyProvider: SecretOrKeyProvider = (
+      request,
+      rawJwtToken,
+      done,
+    ) => {
       const secretOrKey =
         config.accessTokenSignOptions.secret ??
         config.accessTokenSignOptions.privateKey;
@@ -30,7 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
     return {
       userId: payload.sub,
-      roles: payload.roles
+      roles: payload.roles,
     };
   }
 }

@@ -1,7 +1,13 @@
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
-import type { AuthUser, GoogleOAuthConfig, RequestUser, TokenPair, UserRepository } from "../interfaces";
-import { AUTH_CAPABILITIES, PROVIDERS } from "../constants";
-import { TokenService } from "../auth-jwt/token.service";
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import type {
+  AuthUser,
+  GoogleOAuthConfig,
+  RequestUser,
+  TokenPair,
+  UserRepository,
+} from '../interfaces';
+import { AUTH_CAPABILITIES, PROVIDERS } from '../constants';
+import { TokenService } from '../auth-jwt/token.service';
 
 export interface GoogleAuthResponse {
   user: {
@@ -25,7 +31,7 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
     if (!config) {
       throw new Error(
         'GoogleOAuthModule is imported but Google config is not provided. ' +
-        'Either remove the module or provide google config in AuthModule.forRootAsync()'
+          'Either remove the module or provide google config in AuthModule.forRootAsync()',
       );
     }
   }
@@ -34,7 +40,9 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
    * Complete the Google OAuth flow by generating JWT tokens.
    * Call this in your callback controller after Passport attaches user to request.
    */
-  async handleOAuthCallback(requestUser: RequestUser): Promise<GoogleAuthResponse> {
+  async handleOAuthCallback(
+    requestUser: RequestUser,
+  ): Promise<GoogleAuthResponse> {
     // Fetch full user data
     const user = await this.userRepository.findById(requestUser.userId);
     if (!user) {
@@ -68,7 +76,7 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
     // Check if user has another way to login
     if (!user.password && user.googleId) {
       throw new UnauthorizedException(
-        'Cannot unlink Google account. Please set a password first.'
+        'Cannot unlink Google account. Please set a password first.',
       );
     }
 
@@ -85,6 +93,6 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
    */
   async isGoogleLinked(userId: string): Promise<boolean> {
     const user = await this.userRepository.findById(userId);
-    return !!(user?.googleId);
+    return !!user?.googleId;
   }
 }

@@ -4,10 +4,21 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { AUTH_CAPABILITIES, PROVIDERS } from '../constants/tokens';
-import type { AuthResponse, AuthUser, CredentialsAuthConfig, LoginInput, LoginResponse, PasswordChangeInput, PasswordSetInput, RegistrationInput, TokenPair, UserRepository } from '../interfaces';
+import type {
+  AuthResponse,
+  AuthUser,
+  CredentialsAuthConfig,
+  LoginInput,
+  LoginResponse,
+  PasswordChangeInput,
+  PasswordSetInput,
+  RegistrationInput,
+  TokenPair,
+  UserRepository,
+} from '../interfaces';
 import { PasswordService } from './password.service';
 import { TokenService } from 'src/auth-jwt/token.service';
 
@@ -25,7 +36,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
     if (!config) {
       throw new Error(
         'CredentialsAuthModule is imported but credentials config is not provided. ' +
-        'Either remove the module or provide credentials config in AuthModule.forRootAsync()'
+          'Either remove the module or provide credentials config in AuthModule.forRootAsync()',
       );
     }
   }
@@ -35,7 +46,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
    * accepts any DTO that implements CredentialsCreateInput
    */
   async register<UserData extends RegistrationInput = RegistrationInput>(
-    userData: UserData
+    userData: UserData,
   ): Promise<AuthResponse> {
     const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {
@@ -68,7 +79,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
    * Accepts any DTO that has email and password
    */
   async login<UserData extends LoginInput = LoginInput>(
-    credentials: UserData
+    credentials: UserData,
   ): Promise<LoginResponse> {
     const user = await this.userRepository.findByEmail(credentials.email);
     if (!user) {
@@ -78,14 +89,14 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
     // Check if user has a password (might be OAuth-only user)
     if (!user.password) {
       throw new UnauthorizedException(
-        'This account uses social login. Please login with Google.'
+        'This account uses social login. Please login with Google.',
       );
     }
 
     // Verify password
     const isPasswordValid = await this.passwordService.verify(
       credentials.password,
-      user.password
+      user.password,
     );
 
     if (!isPasswordValid) {
@@ -110,7 +121,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
    * Change user password (requires current password).
    */
   async changePassword(
-    input: PasswordChangeInput
+    input: PasswordChangeInput,
   ): Promise<{ message: string }> {
     const user = await this.userRepository.findById(input.userId);
     if (!user) {
@@ -120,14 +131,14 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
     // Check if user has a password
     if (!user.password) {
       throw new BadRequestException(
-        'Cannot change password for OAuth-only accounts'
+        'Cannot change password for OAuth-only accounts',
       );
     }
 
     // Verify current password
     const isCurrentPasswordValid = await this.passwordService.verify(
       input.currentPassword,
-      user.password
+      user.password,
     );
 
     if (!isCurrentPasswordValid) {
@@ -136,10 +147,12 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
 
     const isSamePassword = await this.passwordService.verify(
       input.newPassword,
-      user.password
+      user.password,
     );
     if (isSamePassword) {
-      throw new BadRequestException('New password must be different from current password');
+      throw new BadRequestException(
+        'New password must be different from current password',
+      );
     }
 
     // Hash new password

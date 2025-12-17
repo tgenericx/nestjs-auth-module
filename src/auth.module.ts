@@ -4,11 +4,7 @@ import {
   AuthModuleConfig,
   AuthUser,
 } from './interfaces';
-import {
-  AUTH_CONFIG,
-  AUTH_CAPABILITIES,
-  PROVIDERS,
-} from './constants';
+import { AUTH_CONFIG, AUTH_CAPABILITIES, PROVIDERS } from './constants';
 import { AuthJwtModule } from './auth-jwt/auth-jwt.module';
 import { GoogleOAuthModule } from './google-oauth/google-oauth.module';
 import { CredentialsAuthModule } from './credentials-auth/credentials-auth.module';
@@ -17,7 +13,7 @@ import { CredentialsAuthModule } from './credentials-auth/credentials-auth.modul
 @Module({})
 export class AuthModule {
   static forRootAsync<User extends Partial<AuthUser> = any>(
-    options: AuthModuleAsyncOptions<User>
+    options: AuthModuleAsyncOptions<User>,
   ): DynamicModule {
     const configProvider: Provider = {
       provide: AUTH_CONFIG,

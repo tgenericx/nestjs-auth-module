@@ -9,13 +9,11 @@
 [![CI status](https://img.shields.io/github/actions/workflow/status/tgenericx/nestjs-auth-module/ci.yml?branch=main)](https://github.com/tgenericx/nestjs-auth-module/actions)
 [![Coverage status](https://img.shields.io/codecov/c/github/tgenericx/nestjs-auth-module)](https://codecov.io/gh/tgenericx/nestjs-auth-module)
 
-
 [![TypeScript](https://img.shields.io/badge/TypeScript-⭐-blue)](https://www.typescriptlang.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-⭐-red)](https://nestjs.com/)
 [![JWT](https://img.shields.io/badge/JWT-⭐-yellowgreen)](https://jwt.io/)
 [![Passport](https://img.shields.io/badge/Passport-⭐-blueviolet)](http://www.passportjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-⭐-green)](https://nodejs.org/)
-
 
 ---
 
@@ -27,14 +25,14 @@
 
 ## Features
 
-* 🔐 **JWT Authentication** - Secure access and refresh tokens
-* 🔑 **Password Management** - Argon2 hashing with configurable validation rules
-* 👥 **Role-Based Authorization** - Decorator-based role guards
-* 🌐 **Google OAuth** - Optional Google authentication integration
-* 🛡️ **Security First** - Refresh token rotation, token blacklisting, and secure password policies
-* 📧 **Email Service** - Extensible email service for password reset and verification
-* 🔌 **Database Agnostic** - Works with any database through repository pattern
-* 🎯 **Decorators** - Easy-to-use decorators for controllers (`@CurrentUser`, `@Public`, `@Roles`)
+- 🔐 **JWT Authentication** - Secure access and refresh tokens
+- 🔑 **Password Management** - Argon2 hashing with configurable validation rules
+- 👥 **Role-Based Authorization** - Decorator-based role guards
+- 🌐 **Google OAuth** - Optional Google authentication integration
+- 🛡️ **Security First** - Refresh token rotation, token blacklisting, and secure password policies
+- 📧 **Email Service** - Extensible email service for password reset and verification
+- 🔌 **Database Agnostic** - Works with any database through repository pattern
+- 🎯 **Decorators** - Easy-to-use decorators for controllers (`@CurrentUser`, `@Public`, `@Roles`)
 
 ## Installation
 
@@ -83,9 +81,16 @@ export class UserRepository implements IUserRepository {
   async findById(id: string): Promise<IAuthUser | null> {}
   async findByGoogleId(googleId: string): Promise<IAuthUser | null> {}
   async create(email: string, passwordHash: string): Promise<IAuthUser> {}
-  async createFromGoogle(email: string, googleId: string, profile: any): Promise<IAuthUser> {}
+  async createFromGoogle(
+    email: string,
+    googleId: string,
+    profile: any,
+  ): Promise<IAuthUser> {}
   async updatePassword(userId: string, passwordHash: string): Promise<void> {}
-  async updateRefreshToken(userId: string, refreshToken: string | null): Promise<void> {}
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string | null,
+  ): Promise<void> {}
 }
 ```
 
@@ -273,18 +278,18 @@ async adminRoute() {
 
 ### 🎨 Available Decorators
 
-| Decorator            | Description                  | Example                                   |
-|----------------------|------------------------------|-------------------------------------------|
-| `@CurrentUser()`     | Get authenticated user       | `@CurrentUser() user`                     |
-| `@CurrentUser('id')` | Get specific user property   | `@CurrentUser('id') userId: string`       |
-| `@Public()`          | Mark route as public         | `@Public() @Get('health')`                |
-| `@Roles(...roles)`   | Require specific roles       | `@Roles('admin', 'moderator')`            |
+| Decorator            | Description                | Example                             |
+| -------------------- | -------------------------- | ----------------------------------- |
+| `@CurrentUser()`     | Get authenticated user     | `@CurrentUser() user`               |
+| `@CurrentUser('id')` | Get specific user property | `@CurrentUser('id') userId: string` |
+| `@Public()`          | Mark route as public       | `@Public() @Get('health')`          |
+| `@Roles(...roles)`   | Require specific roles     | `@Roles('admin', 'moderator')`      |
 
 ## Services
 
-* **AuthService** — Registration, login, refresh tokens, logout, Google login
-* **TokenService** — Token generation & verification
-* **PasswordService** — Argon2 hashing and validation
+- **AuthService** — Registration, login, refresh tokens, logout, Google login
+- **TokenService** — Token generation & verification
+- **PasswordService** — Argon2 hashing and validation
 
 ## Email Service Integration (Optional)
 
@@ -340,7 +345,6 @@ AuthModule.forRootAsync({
   emailService?: Provider,
 });
 ```
-
 
 ---
 
