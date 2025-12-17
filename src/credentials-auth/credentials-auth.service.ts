@@ -16,11 +16,10 @@ import type {
   PasswordChangeInput,
   PasswordSetInput,
   RegistrationInput,
-  TokenPair,
   UserRepository,
 } from '../interfaces';
 import { PasswordService } from './password.service';
-import { TokenService } from 'src/auth-jwt/token.service';
+import { TokenService } from '../auth-jwt/token.service';
 
 @Injectable()
 export class CredentialsAuthService<User extends Partial<AuthUser>> {
