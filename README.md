@@ -8,14 +8,11 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/pulls)
 [![CI status](https://img.shields.io/github/actions/workflow/status/tgenericx/nestjs-auth-module/ci.yml?branch=main)](https://github.com/tgenericx/nestjs-auth-module/actions)
 [![Coverage status](https://img.shields.io/codecov/c/github/tgenericx/nestjs-auth-module)](https://codecov.io/gh/tgenericx/nestjs-auth-module)
-
-
 [![TypeScript](https://img.shields.io/badge/TypeScript-⭐-blue)](https://www.typescriptlang.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-⭐-red)](https://nestjs.com/)
 [![JWT](https://img.shields.io/badge/JWT-⭐-yellowgreen)](https://jwt.io/)
 [![Passport](https://img.shields.io/badge/Passport-⭐-blueviolet)](http://www.passportjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-⭐-green)](https://nodejs.org/)
-
 
 ---
 
@@ -27,14 +24,14 @@
 
 ## Features
 
-* 🔐 **JWT Authentication** - Secure access and refresh tokens
-* 🔑 **Password Management** - Argon2 hashing with configurable validation rules
-* 👥 **Role-Based Authorization** - Decorator-based role guards
-* 🌐 **Google OAuth** - Optional Google authentication integration
-* 🛡️ **Security First** - Refresh token rotation, token blacklisting, and secure password policies
-* 📧 **Email Service** - Extensible email service for password reset and verification
-* 🔌 **Database Agnostic** - Works with any database through repository pattern
-* 🎯 **Decorators** - Easy-to-use decorators for controllers (`@CurrentUser`, `@Public`, `@Roles`)
+- 🔐 **JWT Authentication** - Secure access and refresh tokens
+- 🔑 **Password Management** - Argon2 hashing with configurable validation rules
+- 👥 **Role-Based Authorization** - Decorator-based role guards
+- 🌐 **Google OAuth** - Optional Google authentication integration
+- 🛡️ **Security First** - Refresh token rotation, token blacklisting, and secure password policies
+- 📧 **Email Service** - Extensible email service for password reset and verification
+- 🔌 **Database Agnostic** - Works with any database through repository pattern
+- 🎯 **Decorators** - Easy-to-use decorators for controllers (`@CurrentUser`, `@Public`, `@Roles`)
 
 ## Installation
 
@@ -83,9 +80,16 @@ export class UserRepository implements IUserRepository {
   async findById(id: string): Promise<IAuthUser | null> {}
   async findByGoogleId(googleId: string): Promise<IAuthUser | null> {}
   async create(email: string, passwordHash: string): Promise<IAuthUser> {}
-  async createFromGoogle(email: string, googleId: string, profile: any): Promise<IAuthUser> {}
+  async createFromGoogle(
+    email: string,
+    googleId: string,
+    profile: any,
+  ): Promise<IAuthUser> {}
   async updatePassword(userId: string, passwordHash: string): Promise<void> {}
-  async updateRefreshToken(userId: string, refreshToken: string | null): Promise<void> {}
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string | null,
+  ): Promise<void> {}
 }
 ```
 
@@ -104,12 +108,6 @@ import { UserRepository } from './user.repository';
         secret: process.env.JWT_SECRET || 'your-secret-key',
         accessTokenSignOptions: { expiresIn: '15m' },
         refreshTokenSignOptions: { expiresIn: '7d' },
-      },
-      password: {
-        minLength: 8,
-        requireSpecialChar: true,
-        requireNumber: true,
-        requireUppercase: true,
       },
       userRepository: UserRepository,
       // google: {
@@ -219,12 +217,6 @@ interface IAuthModuleConfig {
     accessTokenSignOptions: JwtSignOptions;
     refreshTokenSignOptions: JwtSignOptions;
   };
-  password?: {
-    minLength?: number;
-    requireSpecialChar?: boolean;
-    requireNumber?: boolean;
-    requireUppercase?: boolean;
-  };
   google?: {
     clientID: string;
     clientSecret: string;
@@ -273,18 +265,17 @@ async adminRoute() {
 
 ### 🎨 Available Decorators
 
-| Decorator            | Description                  | Example                                   |
-|----------------------|------------------------------|-------------------------------------------|
-| `@CurrentUser()`     | Get authenticated user       | `@CurrentUser() user`                     |
-| `@CurrentUser('id')` | Get specific user property   | `@CurrentUser('id') userId: string`       |
-| `@Public()`          | Mark route as public         | `@Public() @Get('health')`                |
-| `@Roles(...roles)`   | Require specific roles       | `@Roles('admin', 'moderator')`            |
+| Decorator            | Description                | Example                             |
+| -------------------- | -------------------------- | ----------------------------------- |
+| `@CurrentUser()`     | Get authenticated user     | `@CurrentUser() user`               |
+| `@CurrentUser('id')` | Get specific user property | `@CurrentUser('id') userId: string` |
+| `@Public()`          | Mark route as public       | `@Public() @Get('health')`          |
+| `@Roles(...roles)`   | Require specific roles     | `@Roles('admin', 'moderator')`      |
 
 ## Services
 
-* **AuthService** — Registration, login, refresh tokens, logout, Google login
-* **TokenService** — Token generation & verification
-* **PasswordService** — Argon2 hashing and validation
+- **TokenService** — Token generation & verification
+- **PasswordService** — Argon2 hashing and validation
 
 ## Email Service Integration (Optional)
 
@@ -341,45 +332,11 @@ AuthModule.forRootAsync({
 });
 ```
 
-
 ---
 
-## 🧠 Project Structure (for contributors)
-
-```
-src/
-├── auth.constants.ts
-├── auth.module.ts
-├── decorators/
-│   ├── current-user.decorator.ts
-│   ├── public.decorator.ts
-│   └── roles.decorator.ts
-├── dto/
-│   ├── jwt-payload.dto.ts
-│   ├── login.dto.ts
-│   ├── refresh-token.dto.ts
-│   ├── register.dto.ts
-│   └── token-response.dto.ts
-├── guards/
-│   ├── google-auth.guard.ts
-│   ├── jwt-auth.guard.ts
-│   └── roles.guard.ts
-├── interfaces/
-│   ├── auth-config.interface.ts
-│   ├── auth-user.interface.ts
-│   ├── email-service.interface.ts
-│   └── user-repository.interface.ts
-├── services/
-│   ├── auth.service.ts
-│   ├── password.service.ts
-│   └── token.service.ts
-├── strategies/
-│   ├── google.strategy.ts
-│   └── jwt.strategy.ts
-└── index.ts
-```
-
-This layout makes it easy to navigate — from core module config → to services, guards, decorators, and interfaces.
+## Todo
+- [ ] Refresh token Management
+- [ ] Proper Emailing
 
 ---
 

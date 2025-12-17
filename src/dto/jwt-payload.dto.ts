@@ -1,7 +1,0 @@
-export class JwtPayloadDto {
-  sub: string; // user id
-  email: string;
-  roles?: string[];
-  iat?: number;
-  exp?: number;
-}

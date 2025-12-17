@@ -1,19 +1,13 @@
+export * from './interfaces';
 export * from './auth.module';
-export * from './services/auth.service';
-export * from './services/token.service';
-export * from './services/password.service';
-export * from './guards/jwt-auth.guard';
-export * from './guards/google-auth.guard';
-export * from './guards/roles.guard';
-export * from './decorators/current-user.decorator';
-export * from './decorators/public.decorator';
-export * from './decorators/roles.decorator';
-export * from './dto/login.dto';
-export * from './dto/register.dto';
-export * from './dto/refresh-token.dto';
-export * from './dto/token-response.dto';
-export * from './dto/jwt-payload.dto';
-export * from './interfaces/auth-user.interface';
-export * from './interfaces/user-repository.interface';
-export * from './interfaces/email-service.interface';
-export * from './interfaces/auth-config.interface';
+
+export * from './auth-jwt/decorators/public.decorator';
+export * from './auth-jwt/decorators/roles.decorator';
+export * from './auth-jwt/decorators/current-user.decorator';
+export * from './auth-jwt/jwt-auth.guard';
+export * from './auth-jwt/roles.guard';
+
+export * from './credentials-auth/credentials-auth.service';
+
+export * from './google-oauth/google.service';
+export * from './google-oauth/google-auth.guard';
