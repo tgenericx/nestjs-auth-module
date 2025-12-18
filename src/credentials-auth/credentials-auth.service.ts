@@ -43,20 +43,20 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
 
     const hashedPassword = await this.passwordService.hash(userData.password);
 
-    // Create user with all properties from dto (including extra fields)
     const user = await this.userRepository.create({
       ...userData,
       password: hashedPassword,
     } as unknown as Partial<User>);
 
-    const tokens = this.tokenService.generateTokens(user as AuthUser);
+    if (!user || !user.id) {
+      throw new Error('User creation failed: no ID generated');
+    }
+
+    const tokens = this.tokenService.generateTokens(user.id);
 
     return {
       user: {
-        id: user.id!,
-        email: user.email!,
-        roles: user.roles!,
-        isEmailVerified: user.isEmailVerified!,
+        userId: user.id,
       },
       tokens,
     };
@@ -70,7 +70,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
     credentials: UserData,
   ): Promise<LoginResponse> {
     const user = await this.userRepository.findByEmail(credentials.email);
-    if (!user) {
+    if (!user || !user?.id) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -91,14 +91,12 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Generate tokens
-    const tokens = this.tokenService.generateTokens(user as AuthUser);
+    const tokens = this.tokenService.generateTokens(user.id);
 
     return {
       user: {
         id: user.id!,
         email: user.email!,
-        roles: user.roles!,
         isEmailVerified: user.isEmailVerified!,
       },
       tokens,

@@ -1,22 +1,14 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import type {
+  AuthResponse,
   AuthUser,
+  BaseUser,
   RequestUser,
   TokenPair,
   UserRepository,
 } from '../interfaces';
 import { PROVIDERS } from '../constants';
 import { TokenService } from '../auth-jwt/token.service';
-
-export interface GoogleAuthResponse {
-  user: {
-    id: string;
-    email: string;
-    roles: string[];
-    isEmailVerified: boolean;
-  };
-  tokens: TokenPair;
-}
 
 @Injectable()
 export class GoogleAuthService<User extends Partial<AuthUser>> {
@@ -30,24 +22,18 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
    * Complete the Google OAuth flow by generating JWT tokens.
    * Call this in your callback controller after Passport attaches user to request.
    */
-  async handleOAuthCallback(
-    requestUser: RequestUser,
-  ): Promise<GoogleAuthResponse> {
+  async handleOAuthCallback(requestUser: RequestUser): Promise<AuthResponse> {
     // Fetch full user data
     const user = await this.userRepository.findById(requestUser.userId);
-    if (!user) {
+    if (!user || !user.id) {
       throw new UnauthorizedException('User not found after OAuth');
     }
 
-    // Generate JWT tokens
-    const tokens = this.tokenService.generateTokens(user as AuthUser);
+    const tokens = this.tokenService.generateTokens(user.id);
 
     return {
       user: {
-        id: user.id!,
-        email: user.email!,
-        roles: user.roles!,
-        isEmailVerified: user.isEmailVerified!,
+        userId: user.id!,
       },
       tokens,
     };

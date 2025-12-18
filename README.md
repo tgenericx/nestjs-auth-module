@@ -102,11 +102,13 @@ export class UserRepositoryService implements UserRepository<User> {
   }
 
   async findByEmail(email: string) {
-    return [...this.users.values()].find(u => u.email === email) ?? null;
+    return [...this.users.values()].find((u) => u.email === email) ?? null;
   }
 
   async findByGoogleId(googleId: string) {
-    return [...this.users.values()].find(u => u.googleId === googleId) ?? null;
+    return (
+      [...this.users.values()].find((u) => u.googleId === googleId) ?? null
+    );
   }
 
   async create(data: Partial<User>) {

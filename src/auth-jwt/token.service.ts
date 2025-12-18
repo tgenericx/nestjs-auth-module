@@ -1,13 +1,7 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { JwtService, JwtVerifyOptions } from '@nestjs/jwt';
 import { AUTH_CAPABILITIES } from '../constants';
-import type {
-  AuthUser,
-  BaseUser,
-  JwtConfig,
-  JwtPayload,
-  TokenPair,
-} from '../interfaces';
+import type { BaseUser, JwtConfig, JwtPayload, TokenPair } from '../interfaces';
 
 @Injectable()
 export class TokenService {
@@ -17,10 +11,9 @@ export class TokenService {
     private readonly config: JwtConfig,
   ) {}
 
-  generateAccessToken(user: BaseUser): string {
+  generateAccessToken(userId: BaseUser['id']): string {
     const payload: JwtPayload = {
-      sub: user.id,
-      roles: user.roles,
+      sub: userId,
     };
 
     return this.jwtService.sign(payload, {
@@ -28,18 +21,18 @@ export class TokenService {
     });
   }
 
-  generateRefreshToken(user: { id: string }): string {
-    const payload = { sub: user.id };
+  generateRefreshToken(userId: BaseUser['id']): string {
+    const payload = { sub: userId };
 
     return this.jwtService.sign(payload, {
       ...this.config.refreshTokenSignOptions,
     });
   }
 
-  generateTokens(user: AuthUser): TokenPair {
+  generateTokens(userId: BaseUser['id']): TokenPair {
     return {
-      accessToken: this.generateAccessToken(user),
-      refreshToken: this.generateRefreshToken({ id: user.id }),
+      accessToken: this.generateAccessToken(userId),
+      refreshToken: this.generateRefreshToken(userId),
     };
   }
 
