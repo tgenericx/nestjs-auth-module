@@ -5,7 +5,6 @@ export interface BaseUser {
   id: string;
   email: string;
   isEmailVerified: boolean;
-  roles: string[];
 }
 
 /**

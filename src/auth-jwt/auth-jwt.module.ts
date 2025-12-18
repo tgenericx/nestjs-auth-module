@@ -5,7 +5,6 @@ import { AUTH_CAPABILITIES } from '../constants';
 import { TokenService } from './token.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { RolesGuard } from './roles.guard';
 import { JwtConfig } from '../interfaces';
 
 @Module({})
@@ -22,8 +21,8 @@ export class AuthJwtModule {
           inject: [AUTH_CAPABILITIES.JWT],
         }),
       ],
-      providers: [TokenService, JwtStrategy, JwtAuthGuard, RolesGuard],
-      exports: [TokenService, JwtAuthGuard, RolesGuard],
+      providers: [TokenService, JwtStrategy, JwtAuthGuard],
+      exports: [TokenService, JwtAuthGuard],
     };
   }
 }

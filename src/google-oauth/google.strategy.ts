@@ -46,8 +46,7 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
       return done(new Error('No email found in Google profile'));
     }
 
-    let user: Pick<User, 'id' | 'roles'> | null =
-      await this.user.findByGoogleId(id);
+    let user: Pick<User, 'id'> | null = await this.user.findByGoogleId(id);
 
     if (!user) {
       user = await this.user.findByEmail(email);
@@ -65,7 +64,6 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
     }
     const requestUser: RequestUser = {
       userId: user.id,
-      roles: user.roles,
     };
 
     done(null, requestUser);

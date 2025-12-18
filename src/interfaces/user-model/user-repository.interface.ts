@@ -15,7 +15,8 @@ export interface UserRepository<User extends Partial<AuthUser>> {
  * Extended repository interface for Google OAuth
  * Adds method to find users by their Google ID
  */
-export type GoogleUserRepository<User extends Partial<AuthUser>> =
-  UserRepository<User> & {
-    findByGoogleId(googleId: string): Promise<User | null>;
-  };
+export interface GoogleUserRepository<
+  User extends Partial<AuthUser>,
+> extends UserRepository<User> {
+  findByGoogleId(googleId: string): Promise<User | null>;
+}

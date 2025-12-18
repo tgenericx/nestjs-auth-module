@@ -4,5 +4,4 @@
  */
 export interface RequestUser {
   userId: string;
-  roles: string[];
 }
