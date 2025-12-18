@@ -6,11 +6,10 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { AUTH_CAPABILITIES, PROVIDERS } from '../constants/tokens';
+import { PROVIDERS } from '../constants/tokens';
 import type {
   AuthResponse,
   AuthUser,
-  CredentialsAuthConfig,
   LoginInput,
   LoginResponse,
   PasswordChangeInput,
@@ -28,17 +27,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
     private readonly userRepository: UserRepository<User>,
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
-    @Inject(AUTH_CAPABILITIES.CREDENTIALS)
-    private readonly config: CredentialsAuthConfig | undefined,
-  ) {
-    // Check if credentials auth is enabled
-    if (!config) {
-      throw new Error(
-        'CredentialsAuthModule is imported but credentials config is not provided. ' +
-        'Either remove the module or provide credentials config in AuthModule.forRootAsync()',
-      );
-    }
-  }
+  ) {}
 
   /**
    * Register a new user with email and password.

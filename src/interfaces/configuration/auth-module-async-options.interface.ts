@@ -7,9 +7,12 @@ import { AuthUser, UserRepository } from '../user-model';
  * Asynchronous configuration options for the AuthModule
  * Allows consumers to provide configuration via factories
  */
-export interface AuthModuleAsyncOptions<User extends Partial<AuthUser> = Partial<AuthUser>>
-  extends Pick<ModuleMetadata, 'imports'>,
-  Pick<FactoryProvider<AuthModuleConfig>, 'useFactory' | 'inject'> {
+export interface AuthModuleAsyncOptions<
+  User extends Partial<AuthUser> = Partial<AuthUser>,
+>
+  extends
+    Pick<ModuleMetadata, 'imports'>,
+    Pick<FactoryProvider<AuthModuleConfig>, 'useFactory' | 'inject'> {
   userRepository: Type<UserRepository<User>>;
   enabledCapabilities: ('credentials' | 'google')[];
 }
