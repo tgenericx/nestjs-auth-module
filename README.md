@@ -1,39 +1,58 @@
-# @nahnah/nestjs-auth-module
+<p align="center">
+  <a href="https://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-[![npm version](https://img.shields.io/npm/v/@nahnah/nestjs-auth-module)](https://www.npmjs.com/package/@nahnah/nestjs-auth-module)
-[![License: MIT](https://img.shields.io/npm/l/@nahnah/nestjs-auth-module)](LICENSE)
-[![Downloads](https://img.shields.io/npm/dt/@nahnah/nestjs-auth-module)](https://www.npmjs.com/package/@nahnah/nestjs-auth-module)
-[![GitHub stars](https://img.shields.io/github/stars/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/tgenericx/nestjs-auth-module)](https://github.com/tgenericx/nestjs-auth-module/pulls)
-[![CI status](https://img.shields.io/github/actions/workflow/status/tgenericx/nestjs-auth-module/ci.yml?branch=main)](https://github.com/tgenericx/nestjs-auth-module/actions)
-[![Coverage status](https://img.shields.io/codecov/c/github/tgenericx/nestjs-auth-module)](https://codecov.io/gh/tgenericx/nestjs-auth-module)
-[![TypeScript](https://img.shields.io/badge/TypeScript-⭐-blue)](https://www.typescriptlang.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-⭐-red)](https://nestjs.com/)
-[![JWT](https://img.shields.io/badge/JWT-⭐-yellowgreen)](https://jwt.io/)
-[![Passport](https://img.shields.io/badge/Passport-⭐-blueviolet)](http://www.passportjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-⭐-green)](https://nodejs.org/)
+<h1 align="center">@nahnah/nestjs-auth-module</h1>
+<p align="center">A production-ready authentication module for NestJS featuring JWT, Passport strategies, and seamless integration.</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@nahnah/nestjs-auth-module" target="_blank"><img src="https://img.shields.io/npm/v/@nahnah/nestjs-auth-module.svg" alt="NPM Version" /></a>
+  <a href="LICENSE" target="_blank"><img src="https://img.shields.io/npm/l/@nahnah/nestjs-auth-module.svg" alt="Package License" /></a>
+  <a href="https://www.npmjs.com/package/@nahnah/nestjs-auth-module" target="_blank"><img src="https://img.shields.io/npm/dt/@nahnah/nestjs-auth-module.svg" alt="NPM Downloads" /></a>
+  <a href="https://github.com/tgenericx/nestjs-auth-module/stargazers" target="_blank"><img src="https://img.shields.io/github/stars/tgenericx/nestjs-auth-module.svg" alt="GitHub Stars" /></a>
+  <a href="https://github.com/tgenericx/nestjs-auth-module/network/members" target="_blank"><img src="https://img.shields.io/github/forks/tgenericx/nestjs-auth-module.svg" alt="GitHub Forks" /></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/tgenericx/nestjs-auth-module/issues" target="_blank"><img src="https://img.shields.io/github/issues/tgenericx/nestjs-auth-module.svg" alt="GitHub Issues" /></a>
+  <a href="https://github.com/tgenericx/nestjs-auth-module/pulls" target="_blank"><img src="https://img.shields.io/github/issues-pr/tgenericx/nestjs-auth-module.svg" alt="GitHub Pull Requests" /></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/TypeScript-⭐-blue.svg" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/NestJS-⭐-red.svg" alt="NestJS" />
+  <img src="https://img.shields.io/badge/JWT-⭐-yellowgreen.svg" alt="JWT" />
+  <img src="https://img.shields.io/badge/Passport-⭐-blueviolet.svg" alt="Passport" />
+  <img src="https://img.shields.io/badge/Node.js-⭐-green.svg" alt="Node.js" />
+</p>
 
 ---
 
-## Overview
+## 📖 Overview
 
-`@nahnah/nestjs-auth-module` is a plug-and-play authentication module for NestJS that supports JWT-based access and refresh tokens, secure password hashing with Argon2, optional Google OAuth flow, role-based authorization, and a clean interface-based design so you can plug in your own user repo and email service. Ideal for rapid setup of authentication in production-grade applications.
+`@nahnah/nestjs-auth-module` is a **plug-and-play authentication solution for NestJS** designed for real-world production use.
+
+It provides JWT-based authentication with access and refresh tokens, secure password hashing via **Argon2**, optional **Google OAuth**, role-based authorization, and a clean **interface-driven architecture** that lets you bring your own database and email implementation.
+
+If you want **speed without sacrificing structure**, this module is for you.
 
 ---
 
-## Features
+## ✨ Features
 
-- 🔐 **JWT Authentication** - Secure access and refresh tokens
-- 🔑 **Password Management** - Argon2 hashing with configurable validation rules
-- 👥 **Role-Based Authorization** - Decorator-based role guards
-- 🌐 **Google OAuth** - Optional Google authentication integration
-- 🛡️ **Security First** - Refresh token rotation, token blacklisting, and secure password policies
-- 📧 **Email Service** - Extensible email service for password reset and verification
-- 🔌 **Database Agnostic** - Works with any database through repository pattern
-- 🎯 **Decorators** - Easy-to-use decorators for controllers (`@CurrentUser`, `@Public`, `@Roles`)
+- 🔐 **JWT Authentication** — Access & refresh tokens with configurable lifetimes
+- 🔑 **Secure Passwords** — Argon2 hashing out of the box
+- 🌐 **Google OAuth 2.0** — Optional social authentication
+- 👥 **Role-Based Access Control** — `@Roles()` decorator + guard
+- 🎯 **Clean DX** — `@Public()`, `@CurrentUser()` decorators
+- 🔌 **Database-Agnostic** — Bring your own repository
+- 📦 **Capability-Driven** — Enable only what you need
+- 🛡️ **Fully Type-Safe** — Strict TypeScript support
+- ⚡ **Sensible Defaults** — Zero-config to get started fast
 
-## Installation
+---
+
+## 📦 Installation
 
 ```bash
 npm install @nahnah/nestjs-auth-module
@@ -43,308 +62,199 @@ yarn add @nahnah/nestjs-auth-module
 pnpm add @nahnah/nestjs-auth-module
 ```
 
-## Peer Dependencies
+### Required Peer Dependencies
 
-This module requires the following peer dependencies:
-
-```json
-{
-  "@nestjs/common": "^11.0.1",
-  "@nestjs/core": "^11.0.1",
-  "@nestjs/jwt": "^11.0.2",
-  "@nestjs/passport": "^11.0.5",
-  "@nestjs/platform-express": "^11.0.1",
-  "argon2": "^0.44.0",
-  "class-transformer": "^0.5.1",
-  "class-validator": "^0.14.3",
-  "passport-jwt": "^4.0.1",
-  "passport": "^0.7.0",
-  "passport-google-oauth20": "^2.0.0",
-  "reflect-metadata": "^0.2.2",
-  "rxjs": "^7.8.1"
-}
+```bash
+npm install @nestjs/common @nestjs/core @nestjs/jwt @nestjs/passport \
+passport passport-jwt argon2 class-validator class-transformer
 ```
 
-## Quick Start
+### Optional (Google OAuth)
 
-### 1. Create User Repository
+```bash
+npm install passport-google-oauth20 @types/passport-google-oauth20
+```
 
-```typescript
-// user.repository.ts
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ Implement a User Repository
+
+The module is **database-agnostic**. You must implement the `UserRepository` interface.
+
+```ts
 import { Injectable } from '@nestjs/common';
-import { IUserRepository, IAuthUser } from '@nahnah/nestjs-auth-module';
+import { UserRepository, AuthUser } from '@nahnah/nestjs-auth-module';
+
+export interface User extends AuthUser {
+  firstName?: string;
+  lastName?: string;
+  createdAt?: Date;
+}
 
 @Injectable()
-export class UserRepository implements IUserRepository {
-  async findByEmail(email: string): Promise<IAuthUser | null> {}
-  async findById(id: string): Promise<IAuthUser | null> {}
-  async findByGoogleId(googleId: string): Promise<IAuthUser | null> {}
-  async create(email: string, passwordHash: string): Promise<IAuthUser> {}
-  async createFromGoogle(
-    email: string,
-    googleId: string,
-    profile: any,
-  ): Promise<IAuthUser> {}
-  async updatePassword(userId: string, passwordHash: string): Promise<void> {}
-  async updateRefreshToken(
-    userId: string,
-    refreshToken: string | null,
-  ): Promise<void> {}
+export class UserRepositoryService implements UserRepository<User> {
+  private users = new Map<string, User>();
+
+  async findById(id: string) {
+    return this.users.get(id) ?? null;
+  }
+
+  async findByEmail(email: string) {
+    return [...this.users.values()].find(u => u.email === email) ?? null;
+  }
+
+  async findByGoogleId(googleId: string) {
+    return [...this.users.values()].find(u => u.googleId === googleId) ?? null;
+  }
+
+  async create(data: Partial<User>) {
+    const user: User = {
+      id: crypto.randomUUID(),
+      email: data.email!,
+      password: data.password ?? null,
+      googleId: data.googleId ?? null,
+      isEmailVerified: data.isEmailVerified ?? false,
+      roles: data.roles ?? ['user'],
+      createdAt: new Date(),
+    };
+
+    this.users.set(user.id, user);
+    return user;
+  }
+
+  async update(id: string, data: Partial<User>) {
+    const user = await this.findById(id);
+    if (!user) throw new Error('User not found');
+
+    Object.assign(user, data);
+    return user;
+  }
 }
 ```
 
-### 2. Configure the Module
+---
 
-```typescript
-// app.module.ts
+### 2️⃣ Configure the Auth Module
+
+```ts
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '@nahnah/nestjs-auth-module';
-import { UserRepository } from './user.repository';
+import { UserRepositoryService } from './users/user-repository.service';
 
 @Module({
   imports: [
-    AuthModule.forRoot({
-      jwt: {
-        secret: process.env.JWT_SECRET || 'your-secret-key',
-        accessTokenSignOptions: { expiresIn: '15m' },
-        refreshTokenSignOptions: { expiresIn: '7d' },
-      },
-      userRepository: UserRepository,
-      // google: {
-      //   clientID: process.env.GOOGLE_CLIENT_ID,
-      //   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      //   callbackURL: process.env.GOOGLE_CALLBACK_URL,
-      // },
+    ConfigModule.forRoot({ isGlobal: true }),
+
+    AuthModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        jwt: {
+          accessTokenSignOptions: {
+            secret: config.get('JWT_SECRET')!,
+            expiresIn: '15m',
+          },
+          refreshTokenSignOptions: {
+            secret: config.get('JWT_REFRESH_SECRET')!,
+            expiresIn: '7d',
+          },
+        },
+        credentials: {},
+        google: {
+          clientID: config.get('GOOGLE_CLIENT_ID')!,
+          clientSecret: config.get('GOOGLE_CLIENT_SECRET')!,
+          callbackURL: config.get('GOOGLE_CALLBACK_URL')!,
+        },
+      }),
+      userRepository: UserRepositoryService,
+      enabledCapabilities: ['credentials', 'google'],
     }),
   ],
+  providers: [UserRepositoryService],
 })
 export class AppModule {}
 ```
 
-### 3. Create Auth Controller
+---
 
-```typescript
-// auth.controller.ts
-import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
-import {
-  AuthService,
-  LoginDto,
-  RegisterDto,
-  RefreshTokenDto,
-  TokenResponseDto,
-  JwtAuthGuard,
-  CurrentUser,
-  Public,
-  Roles,
-  RolesGuard,
-} from '@nahnah/nestjs-auth-module';
+## 🎯 Core Concepts
 
-@Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+### Capabilities
 
-  @Public()
-  @Post('register')
-  async register(@Body() dto: RegisterDto): Promise<TokenResponseDto> {
-    return this.authService.register(dto);
-  }
+Enable only what you need:
 
-  @Public()
-  @Post('login')
-  async login(@Body() dto: LoginDto): Promise<TokenResponseDto> {
-    return this.authService.login(dto);
-  }
+```ts
+enabledCapabilities: ['credentials'];
+// or
+enabledCapabilities: ['google'];
+// or
+enabledCapabilities: ['credentials', 'google'];
+```
 
-  @Public()
-  @Post('refresh')
-  async refresh(@Body() dto: RefreshTokenDto): Promise<TokenResponseDto> {
-    return this.authService.refresh(dto.refreshToken);
-  }
+---
 
-  @Post('logout')
-  async logout(@CurrentUser('id') userId: string): Promise<void> {
-    return this.authService.logout(userId);
-  }
+### User Repository Contract
 
-  @Get('me')
-  async getProfile(@CurrentUser() user: any) {
-    return user;
-  }
-
-  @Roles('admin')
-  @UseGuards(RolesGuard)
-  @Get('admin-only')
-  async adminOnly() {
-    return { message: 'Admin access granted' };
-  }
-
-  @Public()
-  @Get('google')
-  @UseGuards(GoogleAuthGuard)
-  async googleAuth() {}
-
-  @Public()
-  @Get('google/callback')
-  @UseGuards(GoogleAuthGuard)
-  async googleAuthCallback(@Req() req) {
-    return this.authService.googleLogin(req.user);
-  }
+```ts
+interface UserRepository<User extends Partial<AuthUser>> {
+  findById(id: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User | null>;
+  create(data: Partial<User>): Promise<User>;
+  update(id: string, data: Partial<User>): Promise<User>;
 }
 ```
 
-### 4. Set up Global Guards
+---
 
-```typescript
-// main.ts
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { JwtAuthGuard } from '@nahnah/nestjs-auth-module';
-
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalGuards(new JwtAuthGuard());
-  await app.listen(3000);
-}
-bootstrap();
-```
-
-## Configuration Options
-
-```typescript
-interface IAuthModuleConfig {
-  jwt: {
-    secret: string;
-    accessTokenSignOptions: JwtSignOptions;
-    refreshTokenSignOptions: JwtSignOptions;
-  };
-  google?: {
-    clientID: string;
-    clientSecret: string;
-    callbackURL: string;
-  };
-  userRepository: any;
-  emailService?: any;
-}
-```
-
-## Decorators
-
-### `@CurrentUser()`
-
-```typescript
-@Get('profile')
-async getProfile(@CurrentUser() user: any) {
-  return user;
-}
-
-@Get('profile-id')
-async getProfileId(@CurrentUser('id') userId: string) {
-  return { userId };
-}
-```
+## 🎨 Decorators
 
 ### `@Public()`
 
-```typescript
-@Public()
-@Get('public-route')
-async publicRoute() {
-  return { message: 'Anyone can access this' };
-}
-```
+Skip authentication for a route.
+
+### `@CurrentUser()`
+
+Access the authenticated user or a specific field.
 
 ### `@Roles()`
 
-```typescript
-@Roles('admin', 'moderator')
-@Get('admin-route')
-async adminRoute() {
-  return { message: 'Admin or moderator access' };
-}
-```
-
-### 🎨 Available Decorators
-
-| Decorator            | Description                | Example                             |
-| -------------------- | -------------------------- | ----------------------------------- |
-| `@CurrentUser()`     | Get authenticated user     | `@CurrentUser() user`               |
-| `@CurrentUser('id')` | Get specific user property | `@CurrentUser('id') userId: string` |
-| `@Public()`          | Mark route as public       | `@Public() @Get('health')`          |
-| `@Roles(...roles)`   | Require specific roles     | `@Roles('admin', 'moderator')`      |
-
-## Services
-
-- **TokenService** — Token generation & verification
-- **PasswordService** — Argon2 hashing and validation
-
-## Email Service Integration (Optional)
-
-```typescript
-// email.service.ts
-import { Injectable } from '@nestjs/common';
-import { IEmailService } from '@nahnah/nestjs-auth-module';
-
-@Injectable()
-export class EmailService implements IEmailService {
-  async sendPasswordResetEmail(email: string, token: string): Promise<void> {}
-  async sendVerificationEmail(email: string, token: string): Promise<void> {}
-}
-```
-
-## Extending the Module
-
-### Custom User Interface
-
-```typescript
-import { IAuthUser } from '@nahnah/nestjs-auth-module';
-
-export interface IAppUser extends IAuthUser {
-  firstName?: string;
-  lastName?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-```
-
-### Custom Guards
-
-```typescript
-import { Injectable } from '@nestjs/common';
-import { JwtAuthGuard } from '@nahnah/nestjs-auth-module';
-
-@Injectable()
-export class CustomAuthGuard extends JwtAuthGuard {}
-```
+Restrict access by role (use with `RolesGuard`).
 
 ---
 
-## ⚙️ Configuration
+## 🔐 Security Best Practices
 
-When importing the module, you must provide a configuration object with the following options:
-
-```ts
-AuthModule.forRootAsync({
-  imports: [...],
-  inject: [...],
-  useFactory: async (...args) => ({ /* IAuthModuleConfig */ }),
-  userRepository: Provider,
-  emailService?: Provider,
-});
-```
+- Always use **environment variables** for secrets
+- Enforce **HTTPS** in production
+- Implement **refresh token rotation** (roadmap)
+- Add **rate limiting** to auth endpoints
+- Enforce **strong password policies**
 
 ---
 
-## Todo
+## 🗺️ Roadmap
 
-- [ ] Refresh token Management
-- [ ] Proper Emailing
+- [ ] Refresh token rotation & blacklisting
+- [ ] Magic link authentication
+- [ ] Account lockout after failed attempts
+- [ ] Password reset flow helpers
+- [ ] Email verification flow helpers
+- [ ] More OAuth providers (GitHub, Microsoft, etc.)
 
 ---
 
 ## 🤝 Contributing
 
-Contributions, bug reports, and pull requests are welcome!
-Feel free to open an issue or submit a PR; please follow code style, write tests, and update documentation as needed.
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ---
 
@@ -354,7 +264,16 @@ MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
-## ⭐ Support / Feedback
+## 🙏 Acknowledgments
 
-If this module helped you, a ⭐ on the repository is always appreciated 😉  
-Open issues or PRs on GitHub if you run into bugs or want to suggest improvements.
+- Built with [NestJS](https://nestjs.com/)
+- Uses [Passport](http://www.passportjs.org/) for authentication strategies
+- Password hashing with [Argon2](https://github.com/ranisalt/node-argon2)
+
+---
+
+## 💬 Support
+
+- 🐛 [Report Issues](https://github.com/tgenericx/nestjs-auth-module/issues)
+- 💡 [Request Features](https://github.com/tgenericx/nestjs-auth-module/issues/new)
+- ⭐ Star the repo if it helped you!
