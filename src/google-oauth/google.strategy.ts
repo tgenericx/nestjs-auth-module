@@ -23,7 +23,7 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
     if (!config) {
       throw new Error(
         'GoogleOAuthModule is imported but Google config is not provided. ' +
-          'Either remove the module or provide google config in AuthModule.forRootAsync()',
+        'Either remove the module or provide google config in AuthModule.forRootAsync()',
       );
     }
     super({
@@ -43,9 +43,7 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
     const email = emails?.[0]?.value;
 
     if (!email) {
-      return done(
-        new UnauthorizedException('No email found in Google profile'),
-      );
+      return done(new Error('No email found in Google profile'));
     }
 
     let user: Pick<User, 'id'> | null = await this.user.findByGoogleId(id);
