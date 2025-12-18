@@ -11,7 +11,6 @@ import type {
   AuthResponse,
   AuthUser,
   LoginInput,
-  LoginResponse,
   PasswordChangeInput,
   PasswordSetInput,
   RegistrationInput,
@@ -68,7 +67,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
    */
   async login<UserData extends LoginInput = LoginInput>(
     credentials: UserData,
-  ): Promise<LoginResponse> {
+  ): Promise<AuthResponse> {
     const user = await this.userRepository.findByEmail(credentials.email);
     if (!user || !user?.id) {
       throw new UnauthorizedException('Invalid credentials');
@@ -95,9 +94,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
 
     return {
       user: {
-        id: user.id!,
-        email: user.email!,
-        isEmailVerified: user.isEmailVerified!,
+        userId: user.id!,
       },
       tokens,
     };
