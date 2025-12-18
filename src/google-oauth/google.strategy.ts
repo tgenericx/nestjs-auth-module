@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20';
 import type {
@@ -43,7 +43,9 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
     const email = emails?.[0]?.value;
 
     if (!email) {
-      return done(new Error('No email found in Google profile'));
+      return done(
+        new UnauthorizedException('No email found in Google profile'),
+      );
     }
 
     let user: Pick<User, 'id'> | null = await this.user.findByGoogleId(id);
