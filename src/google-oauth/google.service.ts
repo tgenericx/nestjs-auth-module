@@ -1,12 +1,11 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import type {
   AuthUser,
-  GoogleOAuthConfig,
   RequestUser,
   TokenPair,
   UserRepository,
 } from '../interfaces';
-import { AUTH_CAPABILITIES, PROVIDERS } from '../constants';
+import { PROVIDERS } from '../constants';
 import { TokenService } from '../auth-jwt/token.service';
 
 export interface GoogleAuthResponse {
@@ -25,16 +24,7 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
     @Inject(PROVIDERS.USER_REPOSITORY)
     private readonly userRepository: UserRepository<User>,
     private readonly tokenService: TokenService,
-    @Inject(AUTH_CAPABILITIES.GOOGLE)
-    private readonly config: GoogleOAuthConfig | undefined,
-  ) {
-    if (!config) {
-      throw new Error(
-        'GoogleOAuthModule is imported but Google config is not provided. ' +
-          'Either remove the module or provide google config in AuthModule.forRootAsync()',
-      );
-    }
-  }
+  ) {}
 
   /**
    * Complete the Google OAuth flow by generating JWT tokens.

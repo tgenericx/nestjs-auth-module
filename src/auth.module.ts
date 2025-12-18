@@ -35,21 +35,22 @@ export class AuthModule {
     const credentialsConfigProvider: Provider = {
       provide: AUTH_CAPABILITIES.CREDENTIALS,
       useFactory: (config: AuthModuleConfig) =>
-        options.enabledCapabilities.includes('credentials') ? config.credentials : undefined,
+        options.enabledCapabilities.includes('credentials')
+          ? config.credentials
+          : undefined,
       inject: [AUTH_CONFIG],
     };
 
     const googleConfigProvider: Provider = {
       provide: AUTH_CAPABILITIES.GOOGLE,
       useFactory: (config: AuthModuleConfig) =>
-        options.enabledCapabilities.includes('google') ? config.google : undefined,
+        options.enabledCapabilities.includes('google')
+          ? config.google
+          : undefined,
       inject: [AUTH_CONFIG],
     };
 
-    const imports = [
-      ...(options.imports || []),
-      AuthJwtModule.forRoot(),
-    ];
+    const imports = [...(options.imports || []), AuthJwtModule.forRoot()];
 
     const exports = [
       AUTH_CONFIG,
@@ -60,20 +61,14 @@ export class AuthModule {
 
     if (options.enabledCapabilities.includes('credentials')) {
       imports.push(CredentialsAuthModule.forRoot());
-      exports.push(
-        AUTH_CAPABILITIES.CREDENTIALS,
-        CredentialsAuthModule,
-      );
+      exports.push(AUTH_CAPABILITIES.CREDENTIALS, CredentialsAuthModule);
     } else {
       exports.push(AUTH_CAPABILITIES.CREDENTIALS);
     }
 
     if (options.enabledCapabilities.includes('google')) {
       imports.push(GoogleOAuthModule.forRoot());
-      exports.push(
-        AUTH_CAPABILITIES.GOOGLE,
-        GoogleOAuthModule,
-      );
+      exports.push(AUTH_CAPABILITIES.GOOGLE, GoogleOAuthModule);
     } else {
       exports.push(AUTH_CAPABILITIES.GOOGLE);
     }

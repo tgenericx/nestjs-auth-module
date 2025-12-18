@@ -4,8 +4,8 @@ import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20';
 import type {
   AuthUser,
   GoogleOAuthConfig,
+  GoogleUserRepository,
   RequestUser,
-  UserRepository,
 } from '../interfaces';
 import { AUTH_CAPABILITIES, PROVIDERS } from '../constants/tokens';
 
@@ -18,7 +18,7 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
     @Inject(AUTH_CAPABILITIES.GOOGLE)
     private readonly config: GoogleOAuthConfig | undefined,
     @Inject(PROVIDERS.USER_REPOSITORY)
-    private readonly user: UserRepository<User>,
+    private readonly user: GoogleUserRepository<User>,
   ) {
     if (!config) {
       throw new Error(
