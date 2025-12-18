@@ -54,25 +54,22 @@ If you want **speed without sacrificing structure**, this module is for you.
 
 ## 📦 Installation
 
+### Want credentials?
+
 ```bash
-npm install @nahnah/nestjs-auth-module
-# or
-yarn add @nahnah/nestjs-auth-module
-# or
-pnpm add @nahnah/nestjs-auth-module
+npm install @nahnah/nestjs-auth-module argon2
 ```
 
-### Required Peer Dependencies
+### Want Google?
 
 ```bash
-npm install @nestjs/common @nestjs/core @nestjs/jwt @nestjs/passport \
-passport passport-jwt argon2 class-validator class-transformer
+npm install @nahnah/nestjs-auth-module passport-google-oauth20
 ```
 
-### Optional (Google OAuth)
+### Want both?
 
 ```bash
-npm install passport-google-oauth20 @types/passport-google-oauth20
+npm install @nahnah/nestjs-auth-module argon2 passport-google-oauth20
 ```
 
 ---
@@ -184,6 +181,10 @@ export class AppModule {}
 
 ## 🎯 Core Concepts
 
+Authentication vs Authorization
+
+This module provides authentication only (verifying user identity). For authorization (checking permissions), implement your own guards and decorators based on your business logic.
+
 ### Capabilities
 
 Enable only what you need:
@@ -220,10 +221,6 @@ Skip authentication for a route.
 ### `@CurrentUser()`
 
 Access the authenticated user or a specific field.
-
-### `@Roles()`
-
-Restrict access by role (use with `RolesGuard`).
 
 ---
 

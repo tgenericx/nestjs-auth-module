@@ -1,0 +1,8 @@
+src/
+test/
+*.ts
+!*.d.ts
+.eslintrc
+jest.config.js
+tsconfig.*
+.prettierrc
