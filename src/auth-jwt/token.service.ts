@@ -9,7 +9,7 @@ export class TokenService {
     private readonly jwtService: JwtService,
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly config: JwtConfig,
-  ) {}
+  ) { }
 
   generateAccessToken(userId: BaseUser['id']): string {
     const payload: JwtPayload = {
@@ -17,7 +17,7 @@ export class TokenService {
     };
 
     return this.jwtService.sign(payload, {
-      ...this.config.accessTokenSignOptions,
+      ...this.config.accessTokenSignOptions.signOptions,
     });
   }
 
@@ -25,7 +25,7 @@ export class TokenService {
     const payload = { sub: userId };
 
     return this.jwtService.sign(payload, {
-      ...this.config.refreshTokenSignOptions,
+      ...this.config.refreshTokenSignOptions.signOptions,
     });
   }
 
@@ -40,7 +40,7 @@ export class TokenService {
     try {
       return await this.jwtService.verifyAsync<JwtPayload>(
         token,
-        this.config.accessTokenSignOptions as JwtVerifyOptions,
+        this.config.accessTokenSignOptions.verifyOptions,
       );
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
@@ -57,7 +57,7 @@ export class TokenService {
     try {
       return await this.jwtService.verifyAsync<{ sub: string }>(
         token,
-        this.config.refreshTokenSignOptions as JwtVerifyOptions,
+        this.config.refreshTokenSignOptions.verifyOptions,
       );
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {

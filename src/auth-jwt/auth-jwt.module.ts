@@ -1,6 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
 import { AUTH_CAPABILITIES } from '../constants';
 import { TokenService } from './token.service';
 import { JwtStrategy } from './jwt.strategy';
@@ -13,7 +12,6 @@ export class AuthJwtModule {
     return {
       module: AuthJwtModule,
       imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.registerAsync({
           useFactory: (jwtConfig: JwtConfig) => ({
             ...jwtConfig.accessTokenSignOptions,
