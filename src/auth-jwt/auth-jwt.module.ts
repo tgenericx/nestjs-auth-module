@@ -4,7 +4,7 @@ import { AUTH_CAPABILITIES } from '../constants';
 import { TokenService } from './token.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { JwtConfig } from '../interfaces';
+import { JwtAuthConfig } from '../interfaces';
 
 @Module({})
 export class AuthJwtModule {
@@ -13,10 +13,10 @@ export class AuthJwtModule {
       module: AuthJwtModule,
       imports: [
         JwtModule.registerAsync({
-          useFactory: (jwtConfig: JwtConfig) => ({
-            ...jwtConfig.accessTokenSignOptions,
-          }),
           inject: [AUTH_CAPABILITIES.JWT],
+          useFactory: (config: JwtAuthConfig) => ({
+            ...config.accessToken,
+          }),
         }),
       ],
       providers: [TokenService, JwtStrategy, JwtAuthGuard],
