@@ -24,12 +24,16 @@ export class TokenService {
 
   generateRefreshToken(userId: BaseUser['id']): string {
     const payload: JwtPayload = { sub: userId, type: 'refresh' };
-    const { secret, privateKey, signOptions } = this.config.refreshToken;
+    const { signOptions } = this.config.refreshToken;
+
+    const keyOptions =
+      'secret' in this.config.refreshToken
+        ? { secret: this.config.refreshToken.secret }
+        : { privateKey: this.config.refreshToken.privateKey };
 
     return this.jwtService.sign(payload, {
       ...signOptions,
-      secret: secret,
-      privateKey: privateKey,
+      ...keyOptions,
     });
   }
 

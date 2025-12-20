@@ -20,6 +20,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: key,
+      algorithms: config.accessToken.signOptions.algorithm
+        ? [config.accessToken.signOptions.algorithm]
+        : undefined,
+      issuer: config.accessToken.signOptions.issuer,
+      audience: config.accessToken.signOptions.audience,
     });
   }
 
