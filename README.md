@@ -76,7 +76,7 @@ npm install @nahnah/nestjs-auth-module argon2 passport-google-oauth20
 
 ## 🚀 Quick Start
 
-### 1️⃣ Implement a User Repository
+### 1️⃣ Implement a User Repository and create controller
 
 The module is **database-agnostic**. You must implement the `UserRepository` interface.
 
@@ -133,18 +133,86 @@ export class UserRepositoryService implements UserRepository<User> {
 }
 ```
 
+```ts
+import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
+import {
+  CurrentUser,
+  Public,
+  GoogleAuthGuard,
+  type AuthenticatedRequest,
+  CredentialsAuthService,
+  AuthResponse,
+  RegistrationInput,
+  LoginInput,
+  GoogleAuthService,
+  type RequestUser,
+} from '@nahnah/nestjs-auth-module';
+import { User } from './app.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
+
+
+export class RegisterDto implements RegistrationInput {
+  email: string;
+  password: string;
+}
+
+export class LoginDto implements LoginInput {
+  email: string;
+  password: string;
+}
+
+@Controller('auth')
+export class AuthController {
+  constructor(
+    private readonly authService: CredentialsAuthService<User>,
+    private readonly google: GoogleAuthService<User>,
+  ) { }
+
+  @Public()
+  @Post('register')
+  async register(@Body() dto: RegisterDto): Promise<AuthResponse> {
+    return this.authService.register(dto);
+  }
+
+  @Public()
+  @Post('login')
+  async login(@Body() dto: LoginDto): Promise<AuthResponse> {
+    return this.authService.login(dto);
+  }
+
+  @Get('me')
+  @ApiBearerAuth('Bearer')
+  async getProfile(@CurrentUser() user: RequestUser) {
+    return user;
+  }
+
+  @Public()
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuth() { }
+
+  @Public()
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuthCallback(@Req() req: AuthenticatedRequest) {
+    return this.google.handleOAuthCallback(req.user);
+  }
+}
+```
+
 ---
 
-### 2️⃣ Configure the Auth Module
+### 2️⃣ Configure the  Auth Module
 
 ```ts
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthModule } from '@nahnah/nestjs-auth-module';
-import { UserRepositoryService } from './users/user-repository.service';
+import { AuthModule, JwtAuthGuard } from '@nahnah/nestjs-auth-module';
+import { UserRepositoryService } from './app.service';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthController } from './app.controller';
 
-@Module({
-  imports: [
+@Module({                                                                                              imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
     AuthModule.forRootAsync({
@@ -166,13 +234,21 @@ import { UserRepositoryService } from './users/user-repository.service';
           clientID: config.get('GOOGLE_CLIENT_ID')!,
           clientSecret: config.get('GOOGLE_CLIENT_SECRET')!,
           callbackURL: config.get('GOOGLE_CALLBACK_URL')!,
+          passReqToCallback: true
         },
       }),
       userRepository: UserRepositoryService,
       enabledCapabilities: ['credentials', 'google'],
     }),
   ],
-  providers: [UserRepositoryService],
+  providers: [
+    UserRepositoryService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
+  controllers: [AuthController]
 })
 export class AppModule {}
 ```
