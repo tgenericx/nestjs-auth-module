@@ -1,9 +1,9 @@
-import { JwtSignOptions } from '@nestjs/jwt';
+import { JwtModuleOptions } from '@nestjs/jwt';
 
 /**
  * Configuration for JWT token generation and validation
  */
 export interface JwtConfig {
-  accessTokenSignOptions: JwtSignOptions;
-  refreshTokenSignOptions: JwtSignOptions;
+  accessTokenSignOptions: JwtModuleOptions;
+  refreshTokenSignOptions: JwtModuleOptions;
 }
