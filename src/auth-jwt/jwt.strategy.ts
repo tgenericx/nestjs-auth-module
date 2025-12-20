@@ -1,50 +1,37 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import type { JwtConfig, JwtPayload, RequestUser } from '../interfaces';
+import type { JwtAuthConfig, JwtPayload, RequestUser } from '../interfaces';
 import { AUTH_CAPABILITIES } from '../constants';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(AUTH_CAPABILITIES.JWT)
-    private readonly config: JwtConfig,
+    private readonly config: JwtAuthConfig,
   ) {
+    const key = config.accessToken.secret || config.accessToken.publicKey;
+
+    if (!key) {
+      throw new Error('JWT Strategy: No secret or publicKey provided in configuration');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKeyProvider: (request, rawJwtToken, done) => {
-        const options = config.accessTokenSignOptions;
-
-        // If secret exists, use it (symmetric)
-        if (options.secret) {
-          return done(null, options.secret as string | Buffer);
-        }
-
-        // If publicKey exists, use it (asymmetric)
-        if (options.publicKey) {
-          const publicKey = options.publicKey;
-
-          if (typeof publicKey === 'string' || Buffer.isBuffer(publicKey)) {
-            return done(null, publicKey);
-          }
-
-          try {
-            return done(null, publicKey as any);
-          } catch (error) {
-            return done(new Error('Invalid public key format for JWT verification'));
-          }
-        }
-
-        return done(new Error('JWT verification key not configured'));
-      },
+      secretOrKey: key,
     });
   }
 
   async validate(payload: JwtPayload): Promise<RequestUser> {
     if (!payload.sub) {
-      throw new UnauthorizedException('Invalid token payload');
+      throw new UnauthorizedException('Invalid token payload: missing sub');
     }
+
+    if (payload.type !== 'access') {
+      throw new UnauthorizedException('Invalid token type: expected access token');
+    }
+
     return {
       userId: payload.sub,
     };
