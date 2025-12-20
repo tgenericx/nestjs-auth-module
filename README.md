@@ -212,7 +212,8 @@ import { UserRepositoryService } from './app.service';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthController } from './app.controller';
 
-@Module({                                                                                              imports: [
+@Module({
+  imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
     AuthModule.forRootAsync({
@@ -220,13 +221,17 @@ import { AuthController } from './app.controller';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         jwt: {
-          accessTokenSignOptions: {
+          accessToken: {
             secret: config.get('JWT_SECRET')!,
-            expiresIn: '15m',
+            signOptions: {
+              expiresIn: '15s',
+            },
           },
-          refreshTokenSignOptions: {
+          refreshToken: {
             secret: config.get('JWT_REFRESH_SECRET')!,
-            expiresIn: '7d',
+            signOptions: {
+              expiresIn: '7d',
+            },
           },
         },
         credentials: {},
@@ -234,7 +239,6 @@ import { AuthController } from './app.controller';
           clientID: config.get('GOOGLE_CLIENT_ID')!,
           clientSecret: config.get('GOOGLE_CLIENT_SECRET')!,
           callbackURL: config.get('GOOGLE_CALLBACK_URL')!,
-          passReqToCallback: true
         },
       }),
       userRepository: UserRepositoryService,
@@ -248,7 +252,7 @@ import { AuthController } from './app.controller';
       useClass: JwtAuthGuard,
     },
   ],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
 export class AppModule {}
 ```
