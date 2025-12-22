@@ -14,6 +14,7 @@ import type {
   BaseRefreshTokenEntity,
 } from '../interfaces';
 import { TokenService } from './token.service';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity> {
@@ -32,7 +33,7 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
    */
   async createRefreshToken(userId: string): Promise<string> {
     const plainToken = this.hashService.generateSecureToken(32);
-    const token = await this.hashService.hash(plainToken);
+    const token = createHash('sha256').update(plainToken).digest('hex');
 
     if (!this.jwtConfig.refreshToken) {
       throw new Error('refresh token must be configured to use refresh token service')
@@ -61,7 +62,7 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
     }
 
     // Hash incoming token to compare with stored hash
-    const tokenHash = await this.hashService.hash(plainToken);
+    const tokenHash = createHash('sha256').update(plainToken).digest('hex');
 
     // Find token in database
     const storedToken = await this.refreshTokenRepo.findByTokenHash(tokenHash);
