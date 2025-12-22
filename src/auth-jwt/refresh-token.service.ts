@@ -120,15 +120,19 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
 
   /**
    * Calculate expiration date from JWT expiresIn format
-   */
-  private calculateExpirationDate(expiresIn: string | number): Date {
-    const now = new Date();
+   // Parse string formats like '7d', '24h', '60m'
+   const match = expiresIn.match(/^(\d+(\.\d+)?)([dhms])$/);
+   if (!match) {
+     throw new Error(`Invalid expiresIn format: ${expiresIn}`);
+   }
 
-    if (typeof expiresIn === 'number') {
-      return new Date(now.getTime() + expiresIn * 1000);
-    }
+   const [, value, , unit] = match;
+   const num = parseFloat(value);
 
-    // Parse string formats like '7d', '24h', '60m'
+   if (isNaN(num)) {
+     throw new Error(`Invalid numeric value in expiresIn: ${expiresIn}`);
+   }
+
     const match = expiresIn.match(/^(\d+)([dhms])$/);
     if (!match) {
       throw new Error(`Invalid expiresIn format: ${expiresIn}`);
