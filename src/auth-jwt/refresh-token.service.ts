@@ -14,7 +14,7 @@ import type {
   BaseRefreshTokenEntity,
 } from '../interfaces';
 import { TokenService } from './token.service';
-import { createHash } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity> {
@@ -86,9 +86,8 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const isValid = crypto.timingSafeEqual(storedTokenBuffer, receivedTokenHashBuffer);
+    const isValid = timingSafeEqual(storedTokenBuffer, receivedTokenHashBuffer);
     if (!isValid) {
-      // This case should theoretically not be reached if findByTokenHash is correct
       throw new UnauthorizedException('Invalid refresh token');
     }
 
