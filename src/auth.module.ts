@@ -3,6 +3,7 @@ import {
   AuthModuleAsyncOptions,
   AuthModuleConfig,
   AuthUser,
+  BaseRefreshTokenEntity,
 } from './interfaces';
 import { AUTH_CONFIG, AUTH_CAPABILITIES, PROVIDERS } from './constants';
 import { AuthJwtModule } from './auth-jwt/auth-jwt.module';
@@ -12,8 +13,11 @@ import { CredentialsAuthModule } from './credentials-auth/credentials-auth.modul
 @Global()
 @Module({})
 export class AuthModule {
-  static forRootAsync<User extends Partial<AuthUser> = any>(
-    options: AuthModuleAsyncOptions<User>,
+  static forRootAsync<
+    User extends Partial<AuthUser> = any,
+    RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity,
+  >(
+    options: AuthModuleAsyncOptions<User, RT>,
   ): DynamicModule {
     const configProvider: Provider = {
       provide: AUTH_CONFIG,
@@ -50,7 +54,21 @@ export class AuthModule {
       inject: [AUTH_CONFIG],
     };
 
-    const imports = [...(options.imports || []), AuthJwtModule.forRoot()];
+    const providers: Provider[] = [
+      configProvider,
+      userRepositoryProvider,
+      jwtConfigProvider,
+      credentialsConfigProvider,
+      googleConfigProvider,
+    ];
+
+    // Determine if refresh tokens are enabled
+    const enableRefreshTokens = !!options.refreshTokenRepository;
+
+    const imports = [
+      ...(options.imports || []),
+      AuthJwtModule.forRoot({ enableRefreshTokens }),
+    ];
 
     const exports = [
       AUTH_CONFIG,
@@ -58,6 +76,16 @@ export class AuthModule {
       PROVIDERS.USER_REPOSITORY,
       AuthJwtModule,
     ];
+
+    // Add refresh token repository if provided
+    if (enableRefreshTokens) {
+      const refreshTokenRepoProvider: Provider = {
+        provide: PROVIDERS.REFRESH_TOKEN_REPOSITORY,
+        useClass: options.refreshTokenRepository!,
+      };
+      providers.push(refreshTokenRepoProvider);
+      exports.push(PROVIDERS.REFRESH_TOKEN_REPOSITORY);
+    }
 
     if (options.enabledCapabilities.includes('credentials')) {
       imports.push(CredentialsAuthModule.forRoot());
@@ -77,13 +105,7 @@ export class AuthModule {
       module: AuthModule,
       global: true,
       imports,
-      providers: [
-        configProvider,
-        userRepositoryProvider,
-        jwtConfigProvider,
-        credentialsConfigProvider,
-        googleConfigProvider,
-      ],
+      providers,
       exports,
     };
   }

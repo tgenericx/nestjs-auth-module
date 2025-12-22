@@ -1,35 +1,29 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Optional } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AUTH_CAPABILITIES } from '../constants';
-import type { BaseUser, JwtAuthConfig, JwtPayload, TokenPair } from '../interfaces';
+import type { BaseRefreshTokenEntity, BaseUser, JwtAuthConfig, JwtPayload, TokenPair } from '../interfaces';
+import { RefreshTokenService } from './refresh-token.service';
 
 @Injectable()
-export class TokenService {
+export class TokenService<
+  RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity,
+> {
   constructor(
     private readonly jwtService: JwtService,
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly config: JwtAuthConfig,
+    @Optional()
+    private readonly refresh?: RefreshTokenService<RT>,
   ) { }
 
   generateAccessToken(userId: BaseUser['id']): string {
     const payload: JwtPayload = { sub: userId, type: 'access' };
-    const { secret, privateKey, signOptions } = this.config.accessToken;
-
-    return this.jwtService.sign(payload, {
-      ...signOptions,
-      secret: secret,
-      privateKey: privateKey,
-    });
-  }
-
-  generateRefreshToken(userId: BaseUser['id']): string {
-    const payload: JwtPayload = { sub: userId, type: 'refresh' };
-    const { signOptions } = this.config.refreshToken;
+    const { signOptions } = this.config.accessToken;
 
     const keyOptions =
-      'secret' in this.config.refreshToken
-        ? { secret: this.config.refreshToken.secret }
-        : { privateKey: this.config.refreshToken.privateKey };
+      'secret' in this.config.accessToken
+        ? { secret: this.config.accessToken.secret }
+        : { privateKey: this.config.accessToken.privateKey };
 
     return this.jwtService.sign(payload, {
       ...signOptions,
@@ -37,10 +31,15 @@ export class TokenService {
     });
   }
 
-  generateTokens(userId: BaseUser['id']): TokenPair {
+  async generateTokens(userId: BaseUser['id']): Promise<TokenPair> {
+    const accessToken = this.generateAccessToken(userId);
+    if (!this.refresh) {
+      return { accessToken }
+    }
+
     return {
-      accessToken: this.generateAccessToken(userId),
-      refreshToken: this.generateRefreshToken(userId),
+      accessToken,
+      refreshToken: await this.refresh.createRefreshToken(userId),
     };
   }
 }
