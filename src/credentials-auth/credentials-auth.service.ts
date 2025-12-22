@@ -26,7 +26,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
     private readonly userRepository: UserRepository<User>,
     private readonly passwordService: PasswordService,
     private readonly tokenService: TokenService,
-  ) {}
+  ) { }
 
   /**
    * Register a new user with email and password.
@@ -51,7 +51,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
       throw new Error('User creation failed: no ID generated');
     }
 
-    const tokens = this.tokenService.generateTokens(user.id);
+    const tokens = await this.tokenService.generateTokens(user.id);
 
     return {
       user: {
@@ -90,7 +90,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = this.tokenService.generateTokens(user.id);
+    const tokens = await this.tokenService.generateTokens(user.id);
 
     return {
       user: {

@@ -1,4 +1,5 @@
 import { JwtSignOptions } from '@nestjs/jwt';
+import { RefreshTokenConfig } from './refresh-token-config.interface';
 
 type SymmetricKey = {
   secret: string | Buffer;
@@ -29,5 +30,5 @@ export type TokenConfig = (SymmetricKey | AsymmetricKey) & {
  */
 export interface JwtAuthConfig {
   accessToken: TokenConfig;
-  refreshToken: TokenConfig;
+  refreshToken?: RefreshTokenConfig;
 }

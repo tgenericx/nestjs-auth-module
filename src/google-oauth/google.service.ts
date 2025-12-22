@@ -16,7 +16,7 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
     @Inject(PROVIDERS.USER_REPOSITORY)
     private readonly userRepository: UserRepository<User>,
     private readonly tokenService: TokenService,
-  ) {}
+  ) { }
 
   /**
    * Complete the Google OAuth flow by generating JWT tokens.
@@ -29,7 +29,7 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
       throw new UnauthorizedException('User not found after OAuth');
     }
 
-    const tokens = this.tokenService.generateTokens(user.id);
+    const tokens = await this.tokenService.generateTokens(user.id);
 
     return {
       user: {
