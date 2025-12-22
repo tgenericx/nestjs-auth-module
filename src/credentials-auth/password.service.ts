@@ -1,22 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import * as argon2 from 'argon2';
-import { randomBytes } from 'crypto';
+import { HashService } from '../utils/hash.service';
 
 @Injectable()
 export class PasswordService {
+  constructor(private readonly hashService: HashService) { }
+
   async hash(password: string): Promise<string> {
-    return argon2.hash(password);
+    return this.hashService.hash(password);
   }
 
   async verify(password: string, hash: string): Promise<boolean> {
-    try {
-      return await argon2.verify(hash, password);
-    } catch (error) {
-      return false;
-    }
+    return this.hashService.verify(password, hash);
   }
 
   generateResetToken(): string {
-    return randomBytes(32).toString('hex');
+    return this.hashService.generateSecureToken();
   }
 }
