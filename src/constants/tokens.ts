@@ -8,4 +8,5 @@ export const AUTH_CAPABILITIES = Object.freeze({
 
 export const PROVIDERS = Object.freeze({
   USER_REPOSITORY: Symbol('USER_REPOSITORY'),
+  REFRESH_TOKEN_REPOSITORY: Symbol('REFRESH_TOKEN_REPOSITORY'),
 });
