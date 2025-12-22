@@ -77,9 +77,18 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
       throw new UnauthorizedException('Refresh token expired');
     }
 
-    // Verify token hash (defense in depth)
-    const isValid = await this.hashService.verify(plainToken, storedToken.token);
+    // Verify token hash (defense in depth against timing attacks)
+    const storedTokenBuffer = Buffer.from(storedToken.token, 'hex');
+    const receivedTokenHashBuffer = Buffer.from(tokenHash, 'hex');
+
+    // Ensure buffers are the same length to prevent timingSafeEqual from throwing
+    if (storedTokenBuffer.length !== receivedTokenHashBuffer.length) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const isValid = crypto.timingSafeEqual(storedTokenBuffer, receivedTokenHashBuffer);
     if (!isValid) {
+      // This case should theoretically not be reached if findByTokenHash is correct
       throw new UnauthorizedException('Invalid refresh token');
     }
 
