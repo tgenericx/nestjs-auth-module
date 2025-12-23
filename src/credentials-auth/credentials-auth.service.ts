@@ -17,7 +17,7 @@ import type {
   UserRepository,
 } from '../interfaces';
 import { PasswordService } from './password.service';
-import { TokenService } from '../auth-jwt/token.service';
+import { AuthJwtService } from '../auth-jwt/auth-jwt.service';
 
 @Injectable()
 export class CredentialsAuthService<User extends Partial<AuthUser>> {
@@ -25,7 +25,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
     @Inject(PROVIDERS.USER_REPOSITORY)
     private readonly userRepository: UserRepository<User>,
     private readonly passwordService: PasswordService,
-    private readonly tokenService: TokenService,
+    private readonly authJwtService: AuthJwtService,
   ) { }
 
   /**
@@ -51,7 +51,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
       throw new Error('User creation failed: no ID generated');
     }
 
-    const tokens = await this.tokenService.generateTokens(user.id);
+    const tokens = await this.authJwtService.generateTokens(user.id);
 
     return {
       user: {
@@ -90,7 +90,7 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.tokenService.generateTokens(user.id);
+    const tokens = await this.authJwtService.generateTokens(user.id);
 
     return {
       user: {
