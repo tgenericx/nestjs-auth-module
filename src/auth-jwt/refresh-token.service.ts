@@ -8,12 +8,9 @@ import { PROVIDERS, AUTH_CAPABILITIES } from '../constants';
 import { HashService } from '../utils/hash.service';
 import type {
   RefreshTokenRepository,
-  TokenRefreshInput,
-  TokenRefreshOutput,
   JwtAuthConfig,
   BaseRefreshTokenEntity,
 } from '../interfaces';
-import { TokenService } from './token.service';
 import { createHash, timingSafeEqual } from 'crypto';
 
 @Injectable()
@@ -24,7 +21,6 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly jwtConfig: JwtAuthConfig,
     private readonly hashService: HashService,
-    private readonly token: TokenService,
   ) { }
 
   /**
@@ -51,12 +47,10 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
   }
 
   /**
-   * Validate refresh token and generate new token pair
+   * Validate refresh token and return userId
    * Implements one-time use: deletes old token after validation
    */
-  async refreshTokens(input: TokenRefreshInput): Promise<TokenRefreshOutput> {
-    const { refreshToken: plainToken } = input;
-
+  async validateAndConsumeRefreshToken(plainToken: string): Promise<string> {
     if (!plainToken) {
       throw new BadRequestException('Refresh token is required');
     }
@@ -94,14 +88,7 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
     // ONE-TIME USE: Delete used token immediately
     await this.refreshTokenRepo.delete(storedToken.id);
 
-    // Generate new token pair
-    const accessToken = this.token.generateAccessToken(storedToken.userId);
-    const newRefreshToken = await this.createRefreshToken(storedToken.userId);
-
-    return {
-      accessToken,
-      refreshToken: newRefreshToken,
-    };
+    return storedToken.userId;
   }
 
   /**

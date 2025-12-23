@@ -2,20 +2,18 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import type {
   AuthResponse,
   AuthUser,
-  BaseUser,
   RequestUser,
-  TokenPair,
   UserRepository,
 } from '../interfaces';
 import { PROVIDERS } from '../constants';
-import { TokenService } from '../auth-jwt/token.service';
+import { AuthJwtService } from '../auth-jwt/auth-jwt.service';
 
 @Injectable()
 export class GoogleAuthService<User extends Partial<AuthUser>> {
   constructor(
     @Inject(PROVIDERS.USER_REPOSITORY)
     private readonly userRepository: UserRepository<User>,
-    private readonly tokenService: TokenService,
+    private readonly authJwtService: AuthJwtService,
   ) { }
 
   /**
@@ -29,7 +27,7 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
       throw new UnauthorizedException('User not found after OAuth');
     }
 
-    const tokens = await this.tokenService.generateTokens(user.id);
+    const tokens = await this.authJwtService.generateTokens(user.id);
 
     return {
       user: {

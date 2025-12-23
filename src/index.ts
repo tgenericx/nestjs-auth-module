@@ -5,7 +5,7 @@ export * from './auth-jwt/decorators/public.decorator';
 export * from './auth-jwt/decorators/current-user.decorator';
 export * from './auth-jwt/jwt-auth.guard';
 export * from './auth-jwt/token.service';
-export * from './auth-jwt/refresh-token.service';
+export * from './auth-jwt/auth-jwt.service';
 
 export * from './credentials-auth/credentials-auth.service';
 
