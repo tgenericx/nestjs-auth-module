@@ -32,7 +32,7 @@
 
 `@nahnah/nestjs-auth-module` is a **plug-and-play authentication solution for NestJS** designed for real-world production use.
 
-It provides JWT-based authentication with access and refresh tokens, secure password hashing via **Argon2**, optional **Google OAuth**, role-based authorization, and a clean **interface-driven architecture** that lets you bring your own database and email implementation.
+It provides JWT-based authentication with access and refresh tokens, secure password hashing via **Argon2**, optional **Google OAuth**, and a clean **interface-driven architecture** that lets you bring your own database implementation.
 
 If you want **speed without sacrificing structure**, this module is for you.
 
@@ -43,11 +43,11 @@ If you want **speed without sacrificing structure**, this module is for you.
 - 🔐 **JWT Authentication** — Access & refresh tokens with configurable lifetimes
 - 🔑 **Secure Passwords** — Argon2 hashing out of the box
 - 🌐 **Google OAuth 2.0** — Optional social authentication
-- 👥 **Role-Based Access Control** — `@Roles()` decorator + guard
 - 🎯 **Clean DX** — `@Public()`, `@CurrentUser()` decorators
 - 🔌 **Database-Agnostic** — Bring your own repository
 - 📦 **Capability-Driven** — Enable only what you need
 - 🛡️ **Fully Type-Safe** — Strict TypeScript support
+- 🔄 **Refresh Token Rotation** — One-time use tokens with automatic cleanup
 - ⚡ **Sensible Defaults** — Zero-config to get started fast
 
 ---
@@ -63,7 +63,7 @@ npm install @nahnah/nestjs-auth-module argon2
 ### Want Google?
 
 ```bash
-npm install @nahnah/nestjs-auth-module passport-google-oauth20
+npm install @nahnah/nestjs-auth-module argon2 passport-google-oauth20
 ```
 
 ### Want both?
@@ -76,13 +76,15 @@ npm install @nahnah/nestjs-auth-module argon2 passport-google-oauth20
 
 ## 🚀 Quick Start
 
-### 1️⃣ Implement a User Repository and create controller
+### 1️⃣ Implement User and Refresh Token Repositories
 
-The module is **database-agnostic**. You must implement the `UserRepository` interface.
+The module is **database-agnostic**. You must implement the `UserRepository` interface, and optionally the `RefreshTokenRepository` interface if you want refresh token support.
+
+#### User Repository
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { UserRepository, AuthUser } from '@nahnah/nestjs-auth-module';
+import { UserRepository, GoogleUserRepository, AuthUser } from '@nahnah/nestjs-auth-module';
 
 export interface User extends AuthUser {
   firstName?: string;
@@ -91,7 +93,7 @@ export interface User extends AuthUser {
 }
 
 @Injectable()
-export class UserRepositoryService implements UserRepository<User> {
+export class UserRepositoryService implements GoogleUserRepository<User> {
   private users = new Map<string, User>();
 
   async findById(id: string) {
@@ -103,9 +105,7 @@ export class UserRepositoryService implements UserRepository<User> {
   }
 
   async findByGoogleId(googleId: string) {
-    return (
-      [...this.users.values()].find((u) => u.googleId === googleId) ?? null
-    );
+    return [...this.users.values()].find((u) => u.googleId === googleId) ?? null;
   }
 
   async create(data: Partial<User>) {
@@ -115,7 +115,6 @@ export class UserRepositoryService implements UserRepository<User> {
       password: data.password ?? null,
       googleId: data.googleId ?? null,
       isEmailVerified: data.isEmailVerified ?? false,
-      roles: data.roles ?? ['user'],
       createdAt: new Date(),
     };
 
@@ -133,6 +132,64 @@ export class UserRepositoryService implements UserRepository<User> {
 }
 ```
 
+#### Refresh Token Repository (Optional)
+
+If you want refresh token support, implement the `RefreshTokenRepository` interface:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { RefreshTokenRepository, BaseRefreshTokenEntity } from '@nahnah/nestjs-auth-module';
+
+export interface RefreshToken extends BaseRefreshTokenEntity {
+  createdAt: Date;
+}
+
+@Injectable()
+export class RefreshTokenRepositoryService implements RefreshTokenRepository<RefreshToken> {
+  private tokens = new Map<string, RefreshToken>();
+
+  async create(data: Omit<RefreshToken, 'id'>) {
+    const token: RefreshToken = {
+      id: crypto.randomUUID(),
+      ...data,
+      createdAt: new Date(),
+    };
+
+    this.tokens.set(token.id, token);
+    return token;
+  }
+
+  async findByTokenHash(tokenHash: string) {
+    return [...this.tokens.values()].find((t) => t.token === tokenHash) ?? null;
+  }
+
+  async delete(id: string) {
+    this.tokens.delete(id);
+  }
+
+  async deleteAllForUser(userId: string) {
+    for (const [id, token] of this.tokens.entries()) {
+      if (token.userId === userId) {
+        this.tokens.delete(id);
+      }
+    }
+  }
+
+  async deleteExpired() {
+    const now = new Date();
+    for (const [id, token] of this.tokens.entries()) {
+      if (token.expiresAt < now) {
+        this.tokens.delete(id);
+      }
+    }
+  }
+}
+```
+
+---
+
+### 2️⃣ Create Authentication Controllers
+
 ```ts
 import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
 import {
@@ -146,10 +203,10 @@ import {
   LoginInput,
   GoogleAuthService,
   type RequestUser,
+  AuthJwtService,
+  TokenRefreshInput,
 } from '@nahnah/nestjs-auth-module';
-import { User } from './app.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
-
+import { User } from './user-repository.service';
 
 export class RegisterDto implements RegistrationInput {
   email: string;
@@ -161,56 +218,73 @@ export class LoginDto implements LoginInput {
   password: string;
 }
 
+export class RefreshTokenDto implements TokenRefreshInput {
+  refreshToken: string;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: CredentialsAuthService<User>,
-    private readonly google: GoogleAuthService<User>,
-  ) { }
+    private readonly credentialsAuth: CredentialsAuthService<User>,
+    private readonly googleAuth: GoogleAuthService<User>,
+    private readonly authJwt: AuthJwtService,
+  ) {}
 
   @Public()
   @Post('register')
   async register(@Body() dto: RegisterDto): Promise<AuthResponse> {
-    return this.authService.register(dto);
+    return this.credentialsAuth.register(dto);
   }
 
   @Public()
   @Post('login')
   async login(@Body() dto: LoginDto): Promise<AuthResponse> {
-    return this.authService.login(dto);
+    return this.credentialsAuth.login(dto);
+  }
+
+  @Public()
+  @Post('refresh')
+  async refresh(@Body() dto: RefreshTokenDto): Promise<AuthResponse> {
+    return this.authJwt.refreshTokens(dto.refreshToken);
   }
 
   @Get('me')
-  @ApiBearerAuth('Bearer')
   async getProfile(@CurrentUser() user: RequestUser) {
     return user;
+  }
+
+  @Post('logout')
+  async logout(@CurrentUser('userId') userId: string) {
+    await this.authJwt.revokeAllTokens(userId);
+    return { message: 'Logged out successfully' };
   }
 
   @Public()
   @Get('google')
   @UseGuards(GoogleAuthGuard)
-  async googleAuth() { }
+  async googleAuth() {}
 
   @Public()
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   async googleAuthCallback(@Req() req: AuthenticatedRequest) {
-    return this.google.handleOAuthCallback(req.user);
+    return this.googleAuth.handleOAuthCallback(req.user);
   }
 }
 ```
 
 ---
 
-### 2️⃣ Configure the  Auth Module
+### 3️⃣ Configure the Auth Module
 
 ```ts
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule, JwtAuthGuard } from '@nahnah/nestjs-auth-module';
-import { UserRepositoryService } from './app.service';
+import { UserRepositoryService } from './user-repository.service';
+import { RefreshTokenRepositoryService } from './refresh-token-repository.service';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthController } from './app.controller';
+import { AuthController } from './auth.controller';
 
 @Module({
   imports: [
@@ -224,14 +298,12 @@ import { AuthController } from './app.controller';
           accessToken: {
             secret: config.get('JWT_SECRET')!,
             signOptions: {
-              expiresIn: '15s',
+              expiresIn: '15m',
+              algorithm: 'HS256',
             },
           },
           refreshToken: {
-            secret: config.get('JWT_REFRESH_SECRET')!,
-            signOptions: {
-              expiresIn: '7d',
-            },
+            expiresIn: 7 * 24 * 60 * 60, // 7 days in seconds
           },
         },
         credentials: {},
@@ -242,11 +314,13 @@ import { AuthController } from './app.controller';
         },
       }),
       userRepository: UserRepositoryService,
+      refreshTokenRepository: RefreshTokenRepositoryService, // Optional
       enabledCapabilities: ['credentials', 'google'],
     }),
   ],
   providers: [
     UserRepositoryService,
+    RefreshTokenRepositoryService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
@@ -261,7 +335,7 @@ export class AppModule {}
 
 ## 🎯 Core Concepts
 
-Authentication vs Authorization
+### Authentication vs Authorization
 
 This module provides authentication only (verifying user identity). For authorization (checking permissions), implement your own guards and decorators based on your business logic.
 
@@ -277,9 +351,60 @@ enabledCapabilities: ['google'];
 enabledCapabilities: ['credentials', 'google'];
 ```
 
+### Refresh Tokens
+
+Refresh tokens are optional. To enable them:
+
+1. Implement the `RefreshTokenRepository` interface
+2. Pass `refreshTokenRepository` to `AuthModule.forRootAsync()`
+3. Configure `refreshToken` settings in your JWT config
+
+Refresh tokens use SHA-256 hashing and implement a one-time use pattern for enhanced security.
+
 ---
 
-### User Repository Contract
+## 🔧 Configuration
+
+### JWT Configuration
+
+```ts
+jwt: {
+  accessToken: {
+    // Option 1: Symmetric key
+    secret: 'your-secret-key',
+    // Option 2: Asymmetric keys
+    // publicKey: fs.readFileSync('public.key'),
+    // privateKey: fs.readFileSync('private.key'),
+    signOptions: {
+      expiresIn: '15m', // Required
+      algorithm: 'HS256', // or 'RS256' for asymmetric
+      issuer: 'your-app-name',
+      audience: 'your-app-users',
+    },
+  },
+  refreshToken: {
+    expiresIn: 604800, // 7 days in seconds
+    tokenLength: 32, // Optional, defaults to 32 bytes
+  },
+}
+```
+
+### Google OAuth Configuration
+
+```ts
+google: {
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: 'http://localhost:3000/auth/google/callback',
+  scope: ['email', 'profile'], // Optional, defaults to ['email', 'profile']
+}
+```
+
+---
+
+## 📚 User Repository Contract
+
+### Basic User Repository
 
 ```ts
 interface UserRepository<User extends Partial<AuthUser>> {
@@ -290,17 +415,123 @@ interface UserRepository<User extends Partial<AuthUser>> {
 }
 ```
 
+### Google User Repository (extends UserRepository)
+
+```ts
+interface GoogleUserRepository<User extends Partial<AuthUser>> extends UserRepository<User> {
+  findByGoogleId(googleId: string): Promise<User | null>;
+}
+```
+
+### Refresh Token Repository
+
+```ts
+interface RefreshTokenRepository<RT extends BaseRefreshTokenEntity> {
+  create(data: Omit<RT, 'id'>): Promise<RT>;
+  findByTokenHash(token: string): Promise<RT | null>;
+  delete(id: string): Promise<void>;
+  deleteAllForUser(userId: string): Promise<void>;
+  deleteExpired?(): Promise<void>; // Optional cleanup method
+}
+```
+
 ---
 
 ## 🎨 Decorators
 
 ### `@Public()`
 
-Skip authentication for a route.
+Skip authentication for a route:
+
+```ts
+@Public()
+@Get('health')
+getHealth() {
+  return { status: 'ok' };
+}
+```
 
 ### `@CurrentUser()`
 
-Access the authenticated user or a specific field.
+Access the authenticated user:
+
+```ts
+// Get entire user object
+@Get('profile')
+getProfile(@CurrentUser() user: RequestUser) {
+  return user;
+}
+
+// Get specific field
+@Get('id')
+getUserId(@CurrentUser('userId') userId: string) {
+  return { userId };
+}
+```
+
+---
+
+## 🛡️ Services
+
+### CredentialsAuthService
+
+Handles email/password authentication:
+
+```ts
+// Register new user
+await credentialsAuth.register({ email, password });
+
+// Login
+await credentialsAuth.login({ email, password });
+
+// Change password (requires current password)
+await credentialsAuth.changePassword({ userId, currentPassword, newPassword });
+
+// Set/reset password (admin operation)
+await credentialsAuth.setPassword({ userId, newPassword });
+
+// Verify email
+await credentialsAuth.verifyEmail(userId);
+
+// Validate user exists
+await credentialsAuth.validateUser(userId);
+```
+
+### GoogleAuthService
+
+Handles Google OAuth authentication:
+
+```ts
+// Complete OAuth callback
+await googleAuth.handleOAuthCallback(requestUser);
+
+// Unlink Google account
+await googleAuth.unlinkGoogleAccount(userId);
+
+// Check if Google is linked
+const isLinked = await googleAuth.isGoogleLinked(userId);
+```
+
+### AuthJwtService
+
+Manages JWT tokens:
+
+```ts
+// Generate access token only
+const accessToken = authJwt.generateAccessToken(userId);
+
+// Generate both tokens (if refresh enabled)
+const { accessToken, refreshToken } = await authJwt.generateTokens(userId);
+
+// Refresh tokens
+const newTokens = await authJwt.refreshTokens(oldRefreshToken);
+
+// Revoke specific token
+await authJwt.revokeToken(tokenId);
+
+// Revoke all tokens (logout all devices)
+await authJwt.revokeAllTokens(userId);
+```
 
 ---
 
@@ -308,20 +539,37 @@ Access the authenticated user or a specific field.
 
 - Always use **environment variables** for secrets
 - Enforce **HTTPS** in production
-- Implement **refresh token rotation** (roadmap)
-- Add **rate limiting** to auth endpoints
+- Use **asymmetric keys** (RS256) for enhanced security
+- Implement **rate limiting** on auth endpoints
 - Enforce **strong password policies**
+- Set appropriate **token expiration times** (15m for access, 7d for refresh)
+- Store refresh tokens securely with **SHA-256 hashing**
+- Implement **refresh token rotation** (one-time use pattern included)
+- Add **CSRF protection** for cookie-based implementations
+
+---
+
+## 🔄 Token Refresh Flow
+
+1. User logs in and receives access + refresh tokens
+2. Access token expires after 15 minutes
+3. Client sends refresh token to `/auth/refresh` endpoint
+4. Module validates refresh token and deletes it (one-time use)
+5. Module generates new access + refresh token pair
+6. Old refresh token is invalidated
 
 ---
 
 ## 🗺️ Roadmap
 
-- [ ] Refresh token rotation & blacklisting
+- [x] Refresh token rotation & one-time use
 - [ ] Magic link authentication
 - [ ] Account lockout after failed attempts
 - [ ] Password reset flow helpers
 - [ ] Email verification flow helpers
 - [ ] More OAuth providers (GitHub, Microsoft, etc.)
+- [ ] Redis adapter for refresh tokens
+- [ ] Token blacklisting for access tokens
 
 ---
 
