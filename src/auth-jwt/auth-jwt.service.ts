@@ -49,8 +49,11 @@ export class AuthJwtService<
     }
     const userId = await this.refreshTokenService.validateAndConsumeRefreshToken(oldRefreshToken);
 
-    const refreshToken = await this.refreshTokenService.createRefreshToken(userId);
-    const accessToken = this.tokenService.generateAccessToken(userId);
+    const [accessToken, refreshToken] = await Promise.all([
+      this.tokenService.generateAccessToken(userId),
+      this.refreshTokenService.createRefreshToken(userId)
+    ]);
+
     return {
       user: {
         userId
