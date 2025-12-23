@@ -3,7 +3,7 @@ import { HashService } from '../utils/hash.service';
 
 @Injectable()
 export class PasswordService {
-  constructor(private readonly hashService: HashService) { }
+  constructor(private readonly hashService: HashService) {}
 
   async hash(password: string): Promise<string> {
     return this.hashService.hash(password);

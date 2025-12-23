@@ -3,7 +3,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import type { JwtAuthConfig, JwtPayload, RequestUser } from '../interfaces';
 import { AUTH_CAPABILITIES } from '../constants';
-import { getVerificationKey, validateTokenConfig } from '../interfaces/configuration/jwt-config.interface';
+import {
+  getVerificationKey,
+  validateTokenConfig,
+} from '../interfaces/configuration/jwt-config.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -33,7 +36,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     if (payload.type !== 'access') {
-      throw new UnauthorizedException('Invalid token type: expected access token');
+      throw new UnauthorizedException(
+        'Invalid token type: expected access token',
+      );
     }
 
     return {

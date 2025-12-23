@@ -2,7 +2,7 @@ import {
   Injectable,
   Inject,
   UnauthorizedException,
-  BadRequestException
+  BadRequestException,
 } from '@nestjs/common';
 import { PROVIDERS, AUTH_CAPABILITIES } from '../constants';
 import { HashService } from '../utils/hash.service';
@@ -14,14 +14,16 @@ import type {
 import { createHash, timingSafeEqual } from 'crypto';
 
 @Injectable()
-export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity> {
+export class RefreshTokenService<
+  RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity,
+> {
   constructor(
     @Inject(PROVIDERS.REFRESH_TOKEN_REPOSITORY)
     private readonly refreshTokenRepo: RefreshTokenRepository<RT>,
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly jwtConfig: JwtAuthConfig,
     private readonly hashService: HashService,
-  ) { }
+  ) {}
 
   /**
    * Generate and persist a new refresh token
@@ -29,12 +31,14 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
    */
   async createRefreshToken(userId: string): Promise<string> {
     const plainToken = this.hashService.generateSecureToken(
-      this.jwtConfig.refreshToken?.tokenLength
+      this.jwtConfig.refreshToken?.tokenLength,
     );
     const token = createHash('sha256').update(plainToken).digest('hex');
 
     if (!this.jwtConfig.refreshToken) {
-      throw new Error('refresh token must be configured to use refresh token service')
+      throw new Error(
+        'refresh token must be configured to use refresh token service',
+      );
     }
     const expiresIn = this.jwtConfig.refreshToken.expiresIn;
     const expiresAt = this.calculateExpirationDate(expiresIn);

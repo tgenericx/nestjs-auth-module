@@ -1,7 +1,12 @@
 import { BadRequestException, Injectable, Optional } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { RefreshTokenService } from './refresh-token.service';
-import type { BaseUser, TokenPair, BaseRefreshTokenEntity, AuthResponse } from '../interfaces';
+import type {
+  BaseUser,
+  TokenPair,
+  BaseRefreshTokenEntity,
+  AuthResponse,
+} from '../interfaces';
 
 @Injectable()
 export class AuthJwtService<
@@ -11,7 +16,7 @@ export class AuthJwtService<
     private readonly tokenService: TokenService,
     @Optional()
     private readonly refreshTokenService?: RefreshTokenService<RT>,
-  ) { }
+  ) {}
 
   /**
    * Generate access token only
@@ -31,7 +36,8 @@ export class AuthJwtService<
       return { accessToken };
     }
 
-    const refreshToken = await this.refreshTokenService.createRefreshToken(userId);
+    const refreshToken =
+      await this.refreshTokenService.createRefreshToken(userId);
 
     return {
       accessToken,
@@ -47,16 +53,19 @@ export class AuthJwtService<
     if (!this.refreshTokenService) {
       throw new BadRequestException('Refresh tokens are not enabled');
     }
-    const userId = await this.refreshTokenService.validateAndConsumeRefreshToken(oldRefreshToken);
+    const userId =
+      await this.refreshTokenService.validateAndConsumeRefreshToken(
+        oldRefreshToken,
+      );
 
     const [accessToken, refreshToken] = await Promise.all([
       this.tokenService.generateAccessToken(userId),
-      this.refreshTokenService.createRefreshToken(userId)
+      this.refreshTokenService.createRefreshToken(userId),
     ]);
 
     return {
       user: {
-        userId
+        userId,
       },
       accessToken,
       refreshToken,
