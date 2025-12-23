@@ -28,7 +28,9 @@ export class RefreshTokenService<RT extends BaseRefreshTokenEntity = BaseRefresh
    * Called after login/registration/token refresh
    */
   async createRefreshToken(userId: string): Promise<string> {
-    const plainToken = this.hashService.generateSecureToken(32);
+    const plainToken = this.hashService.generateSecureToken(
+      this.jwtConfig.refreshToken?.tokenLength
+    );
     const token = createHash('sha256').update(plainToken).digest('hex');
 
     if (!this.jwtConfig.refreshToken) {

@@ -27,13 +27,14 @@ export class GoogleAuthService<User extends Partial<AuthUser>> {
       throw new UnauthorizedException('User not found after OAuth');
     }
 
-    const tokens = await this.authJwtService.generateTokens(user.id);
+    const { accessToken, refreshToken } = await this.authJwtService.generateTokens(user.id);
 
     return {
       user: {
-        userId: user.id!,
+        userId: user.id,
       },
-      tokens,
+      accessToken,
+      refreshToken,
     };
   }
 

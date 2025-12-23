@@ -4,7 +4,6 @@ import { TokenPair } from './token-pair.interface';
 /**
  * Standard response format for authentication operations
  */
-export interface AuthResponse {
+export interface AuthResponse extends TokenPair {
   user: RequestUser;
-  tokens: TokenPair;
 }

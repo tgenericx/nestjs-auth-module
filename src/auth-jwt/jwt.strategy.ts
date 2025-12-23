@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import type { JwtAuthConfig, JwtPayload, RequestUser } from '../interfaces';
 import { AUTH_CAPABILITIES } from '../constants';
+import { getVerificationKey, validateTokenConfig } from '../interfaces/configuration/jwt-config.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -10,16 +11,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly config: JwtAuthConfig,
   ) {
-    const key = config.accessToken.secret || config.accessToken.publicKey;
+    validateTokenConfig(config.accessToken, 'JWT accessToken');
 
-    if (!key) {
-      throw new Error('JWT Strategy: No secret or publicKey provided in configuration');
-    }
+    const secretOrKey = getVerificationKey(config.accessToken);
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: key,
+      secretOrKey,
       algorithms: config.accessToken.signOptions.algorithm
         ? [config.accessToken.signOptions.algorithm]
         : undefined,
