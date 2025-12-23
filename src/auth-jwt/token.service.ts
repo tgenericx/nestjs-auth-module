@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AUTH_CAPABILITIES } from '../constants';
 import type { BaseUser, JwtAuthConfig, JwtPayload } from '../interfaces';
+import { isSymmetricConfig } from '../interfaces/configuration/jwt-config.interface';
 
 @Injectable()
 export class TokenService {
@@ -15,10 +16,9 @@ export class TokenService {
     const payload: JwtPayload = { sub: userId, type: 'access' };
     const { signOptions } = this.config.accessToken;
 
-    const keyOptions =
-      'secret' in this.config.accessToken
-        ? { secret: this.config.accessToken.secret }
-        : { privateKey: this.config.accessToken.privateKey };
+    const keyOptions = isSymmetricConfig(this.config.accessToken)
+      ? { secret: this.config.accessToken.secret }
+      : { privateKey: this.config.accessToken.privateKey };
 
     return this.jwtService.sign(payload, {
       ...signOptions,

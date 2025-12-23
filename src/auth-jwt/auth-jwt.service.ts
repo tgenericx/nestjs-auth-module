@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@nestjs/common';
+import { BadRequestException, Injectable, Optional } from '@nestjs/common';
 import { TokenService } from './token.service';
 import { RefreshTokenService } from './refresh-token.service';
 import type { BaseUser, TokenPair, BaseRefreshTokenEntity, AuthResponse } from '../interfaces';
@@ -45,7 +45,7 @@ export class AuthJwtService<
    */
   async refreshTokens(oldRefreshToken: string): Promise<AuthResponse> {
     if (!this.refreshTokenService) {
-      throw new Error('Refresh tokens are not enabled');
+      throw new BadRequestException('Refresh tokens are not enabled');
     }
     const userId = await this.refreshTokenService.validateAndConsumeRefreshToken(oldRefreshToken);
 
@@ -58,10 +58,8 @@ export class AuthJwtService<
       user: {
         userId
       },
-      tokens: {
-        accessToken,
-        refreshToken,
-      }
+      accessToken,
+      refreshToken,
     };
   }
 

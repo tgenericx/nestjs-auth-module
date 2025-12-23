@@ -51,13 +51,14 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
       throw new Error('User creation failed: no ID generated');
     }
 
-    const tokens = await this.authJwtService.generateTokens(user.id);
+    const { accessToken, refreshToken } = await this.authJwtService.generateTokens(user.id);
 
     return {
       user: {
         userId: user.id,
       },
-      tokens,
+      accessToken,
+      refreshToken,
     };
   }
 
@@ -90,13 +91,14 @@ export class CredentialsAuthService<User extends Partial<AuthUser>> {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const tokens = await this.authJwtService.generateTokens(user.id);
+    const { accessToken, refreshToken } = await this.authJwtService.generateTokens(user.id);
 
     return {
       user: {
-        userId: user.id!,
+        userId: user.id,
       },
-      tokens,
+      accessToken,
+      refreshToken,
     };
   }
 
