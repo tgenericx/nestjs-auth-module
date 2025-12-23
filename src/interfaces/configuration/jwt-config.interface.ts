@@ -40,7 +40,7 @@ export interface JwtAuthConfig {
 
 /**
  * Create symmetric key configuration (HS256/HS384/HS512)
- * 
+ *
  * @example
  * ```ts
  * const config = createSymmetricTokenConfig({
@@ -53,7 +53,7 @@ export interface JwtAuthConfig {
  * ```
  */
 export function createSymmetricTokenConfig(
-  config: Omit<SymmetricTokenConfig, 'type'>
+  config: Omit<SymmetricTokenConfig, 'type'>,
 ): SymmetricTokenConfig {
   return {
     type: 'symmetric',
@@ -63,7 +63,7 @@ export function createSymmetricTokenConfig(
 
 /**
  * Create asymmetric key configuration (RS256/ES256/etc.)
- * 
+ *
  * @example
  * ```ts
  * const config = createAsymmetricTokenConfig({
@@ -77,7 +77,7 @@ export function createSymmetricTokenConfig(
  * ```
  */
 export function createAsymmetricTokenConfig(
-  config: Omit<AsymmetricTokenConfig, 'type'>
+  config: Omit<AsymmetricTokenConfig, 'type'>,
 ): AsymmetricTokenConfig {
   return {
     type: 'asymmetric',
@@ -89,26 +89,37 @@ export function createAsymmetricTokenConfig(
  * Validate token configuration at runtime
  * Throws descriptive error if configuration is invalid
  */
-export function validateTokenConfig(config: TokenConfig, configName: string): void {
+export function validateTokenConfig(
+  config: TokenConfig,
+  configName: string,
+): void {
   if (!config.signOptions?.expiresIn) {
     throw new Error(
-      `${configName}: signOptions.expiresIn is required to prevent immortal tokens`
+      `${configName}: signOptions.expiresIn is required to prevent immortal tokens`,
     );
   }
 
   if (config.type === 'symmetric') {
     if (!config.secret) {
-      throw new Error(`${configName}: secret is required for symmetric key configuration`);
+      throw new Error(
+        `${configName}: secret is required for symmetric key configuration`,
+      );
     }
   } else if (config.type === 'asymmetric') {
     if (!config.publicKey) {
-      throw new Error(`${configName}: publicKey is required for asymmetric key configuration`);
+      throw new Error(
+        `${configName}: publicKey is required for asymmetric key configuration`,
+      );
     }
     if (!config.privateKey) {
-      throw new Error(`${configName}: privateKey is required for asymmetric key configuration`);
+      throw new Error(
+        `${configName}: privateKey is required for asymmetric key configuration`,
+      );
     }
   } else {
-    throw new Error(`${configName}: invalid type, must be 'symmetric' or 'asymmetric'`);
+    throw new Error(
+      `${configName}: invalid type, must be 'symmetric' or 'asymmetric'`,
+    );
   }
 }
 
@@ -134,10 +145,14 @@ export function getSigningKey(config: TokenConfig): string | Buffer {
   }
 }
 
-export function isSymmetricConfig(config: TokenConfig): config is SymmetricTokenConfig {
+export function isSymmetricConfig(
+  config: TokenConfig,
+): config is SymmetricTokenConfig {
   return config.type === 'symmetric';
 }
 
-export function isAsymmetricConfig(config: TokenConfig): config is AsymmetricTokenConfig {
+export function isAsymmetricConfig(
+  config: TokenConfig,
+): config is AsymmetricTokenConfig {
   return config.type === 'asymmetric';
 }

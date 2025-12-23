@@ -84,7 +84,11 @@ The module is **database-agnostic**. You must implement the `UserRepository` int
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { UserRepository, GoogleUserRepository, AuthUser } from '@nahnah/nestjs-auth-module';
+import {
+  UserRepository,
+  GoogleUserRepository,
+  AuthUser,
+} from '@nahnah/nestjs-auth-module';
 
 export interface User extends AuthUser {
   firstName?: string;
@@ -105,7 +109,9 @@ export class UserRepositoryService implements GoogleUserRepository<User> {
   }
 
   async findByGoogleId(googleId: string) {
-    return [...this.users.values()].find((u) => u.googleId === googleId) ?? null;
+    return (
+      [...this.users.values()].find((u) => u.googleId === googleId) ?? null
+    );
   }
 
   async create(data: Partial<User>) {
@@ -138,7 +144,10 @@ If you want refresh token support, implement the `RefreshTokenRepository` interf
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { RefreshTokenRepository, BaseRefreshTokenEntity } from '@nahnah/nestjs-auth-module';
+import {
+  RefreshTokenRepository,
+  BaseRefreshTokenEntity,
+} from '@nahnah/nestjs-auth-module';
 
 export interface RefreshToken extends BaseRefreshTokenEntity {
   createdAt: Date;
@@ -280,7 +289,11 @@ export class AuthController {
 ```ts
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthModule, JwtAuthGuard } from '@nahnah/nestjs-auth-module';
+import {
+  AuthModule,
+  JwtAuthGuard,
+  createSymmetricTokenConfig,
+} from '@nahnah/nestjs-auth-module';
 import { UserRepositoryService } from './user-repository.service';
 import { RefreshTokenRepositoryService } from './refresh-token-repository.service';
 import { APP_GUARD } from '@nestjs/core';
@@ -295,13 +308,13 @@ import { AuthController } from './auth.controller';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         jwt: {
-          accessToken: {
+          accessToken: createSymmetricTokenConfig({
             secret: config.get('JWT_SECRET')!,
             signOptions: {
               expiresIn: '15m',
               algorithm: 'HS256',
             },
-          },
+          }),
           refreshToken: {
             expiresIn: 7 * 24 * 60 * 60, // 7 days in seconds
           },
@@ -368,25 +381,32 @@ Refresh tokens use SHA-256 hashing and implement a one-time use pattern for enha
 ### JWT Configuration
 
 ```ts
-jwt: {
-  accessToken: {
-    // Option 1: Symmetric key
-    secret: 'your-secret-key',
-    // Option 2: Asymmetric keys
-    // publicKey: fs.readFileSync('public.key'),
-    // privateKey: fs.readFileSync('private.key'),
-    signOptions: {
-      expiresIn: '15m', // Required
-      algorithm: 'HS256', // or 'RS256' for asymmetric
-      issuer: 'your-app-name',
-      audience: 'your-app-users',
-    },
-  },
-  refreshToken: {
-    expiresIn: 604800, // 7 days in seconds
-    tokenLength: 32, // Optional, defaults to 32 bytes
-  },
-}
+import {
+  createSymmetricTokenConfig,
+  createAsymmetricTokenConfig,
+} from '@nahnah/nestjs-auth-module';
+import * as fs from 'fs';
+
+const isProd = process.env.NODE_ENV === 'production';
+
+const accessToken = isProd
+  ? createAsymmetricTokenConfig({
+      publicKey: fs.readFileSync(process.env.JWT_PUBLIC_KEY_PATH!),
+      privateKey: fs.readFileSync(process.env.JWT_PRIVATE_KEY_PATH!),
+      signOptions: {
+        expiresIn: '15m',
+        algorithm: 'RS256',
+        issuer: 'my-app',
+      },
+    })
+  : createSymmetricTokenConfig({
+      secret: process.env.JWT_SECRET!,
+      signOptions: {
+        expiresIn: '15m',
+        algorithm: 'HS256',
+        issuer: 'my-app',
+      },
+    });
 ```
 
 ### Google OAuth Configuration
@@ -418,7 +438,9 @@ interface UserRepository<User extends Partial<AuthUser>> {
 ### Google User Repository (extends UserRepository)
 
 ```ts
-interface GoogleUserRepository<User extends Partial<AuthUser>> extends UserRepository<User> {
+interface GoogleUserRepository<
+  User extends Partial<AuthUser>,
+> extends UserRepository<User> {
   findByGoogleId(googleId: string): Promise<User | null>;
 }
 ```

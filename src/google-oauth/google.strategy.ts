@@ -23,7 +23,7 @@ export class GoogleStrategy<User extends AuthUser> extends PassportStrategy(
     if (!config) {
       throw new Error(
         'GoogleOAuthModule is imported but Google config is not provided. ' +
-        'Either remove the module or provide google config in AuthModule.forRootAsync()',
+          'Either remove the module or provide google config in AuthModule.forRootAsync()',
       );
     }
     super({

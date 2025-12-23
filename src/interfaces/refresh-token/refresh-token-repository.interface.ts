@@ -1,10 +1,12 @@
-import { BaseRefreshTokenEntity } from "./refresh-token.interface";
+import { BaseRefreshTokenEntity } from './refresh-token.interface';
 
 /**
  * Contract for refresh token storage (database, Redis, etc.)
  * Must be implemented by consumers
  */
-export interface RefreshTokenRepository<RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity> {
+export interface RefreshTokenRepository<
+  RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity,
+> {
   /**
    * Store a new refresh token (hashed)
    * @returns Created refresh token entity

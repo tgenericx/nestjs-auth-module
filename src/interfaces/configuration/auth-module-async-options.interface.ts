@@ -2,7 +2,10 @@ import { ModuleMetadata, FactoryProvider } from '@nestjs/common';
 import { Type } from '@nestjs/common';
 import { AuthModuleConfig } from './auth-module-config.interface';
 import { AuthUser, UserRepository } from '../user-model';
-import { BaseRefreshTokenEntity, RefreshTokenRepository } from '../refresh-token';
+import {
+  BaseRefreshTokenEntity,
+  RefreshTokenRepository,
+} from '../refresh-token';
 
 /**
  * Asynchronous configuration options for the AuthModule
@@ -13,8 +16,8 @@ export interface AuthModuleAsyncOptions<
   RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity,
 >
   extends
-  Pick<ModuleMetadata, 'imports'>,
-  Pick<FactoryProvider<AuthModuleConfig>, 'useFactory' | 'inject'> {
+    Pick<ModuleMetadata, 'imports'>,
+    Pick<FactoryProvider<AuthModuleConfig>, 'useFactory' | 'inject'> {
   userRepository: Type<UserRepository<User>>;
   refreshTokenRepository?: Type<RefreshTokenRepository<RT>>;
   enabledCapabilities: ('credentials' | 'google')[];

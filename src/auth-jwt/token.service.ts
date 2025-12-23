@@ -10,7 +10,7 @@ export class TokenService {
     private readonly jwtService: JwtService,
     @Inject(AUTH_CAPABILITIES.JWT)
     private readonly config: JwtAuthConfig,
-  ) { }
+  ) {}
 
   generateAccessToken(userId: BaseUser['id']): string {
     const payload: JwtPayload = { sub: userId, type: 'access' };

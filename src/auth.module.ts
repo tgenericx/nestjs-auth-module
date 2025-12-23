@@ -16,9 +16,7 @@ export class AuthModule {
   static forRootAsync<
     User extends Partial<AuthUser> = any,
     RT extends BaseRefreshTokenEntity = BaseRefreshTokenEntity,
-  >(
-    options: AuthModuleAsyncOptions<User, RT>,
-  ): DynamicModule {
+  >(options: AuthModuleAsyncOptions<User, RT>): DynamicModule {
     const configProvider: Provider = {
       provide: AUTH_CONFIG,
       useFactory: options.useFactory,
