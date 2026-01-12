@@ -28,6 +28,10 @@
 
 ---
 
+![Alt](https://repobeats.axiom.co/api/embed/8b5897bdd65c0f81133aefdc27c0b851931f2743.svg "Repobeats analytics image")
+
+---
+
 ## 📖 Overview
 
 `@nahnah/nestjs-auth-module` is a **plug-and-play authentication solution for NestJS** designed for real-world production use.
